@@ -93,9 +93,9 @@
     },
     "Madness Prone": {
       "int_mult": 0.85,
-      "resistance": 0.15,
+      "resistance": -0.15,
       "atk_mult": 1.1,
-      "desc": "-15% INT, +15% INT resistance, +10% ATK"
+      "desc": "-15% INT, -15% INT resistance, +10% ATK"
     }
   },
   "TRAIT_NAMES": [
@@ -207,7 +207,6 @@
       "id": "none",
       "name": "Bare Hands",
       "atk": 0,
-      "range": 1,
       "kind": "unarmed",
       "crit": 0,
       "dodge": 0,
@@ -219,7 +218,6 @@
       "id": "revolver",
       "name": "Service Revolver",
       "atk": 30,
-      "range": 18,
       "kind": "gun",
       "crit": 0.02,
       "dodge": 0,
@@ -231,7 +229,6 @@
       "id": "pistol",
       "name": "Pocket Pistol",
       "atk": 26,
-      "range": 12,
       "kind": "gun",
       "crit": 0.01,
       "dodge": 0,
@@ -243,7 +240,6 @@
       "id": "sword",
       "name": "Service Sword",
       "atk": 12,
-      "range": 2,
       "kind": "weapon",
       "crit": 0.03,
       "dodge": 0,
@@ -255,7 +251,6 @@
       "id": "knife",
       "name": "Fighting Knife",
       "atk": 8,
-      "range": 1,
       "kind": "weapon",
       "crit": 0.04,
       "dodge": 0,
@@ -267,7 +262,6 @@
       "id": "club",
       "name": "Heavy Club",
       "atk": 10,
-      "range": 1,
       "kind": "weapon",
       "crit": 0.01,
       "dodge": 0,
