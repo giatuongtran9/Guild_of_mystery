@@ -1,0 +1,280 @@
+{
+  "schema": "pathway.v1",
+  "key": "death",
+  "name": "Death",
+  "group": "Eternal Darkness",
+  "archetype": "Physical",
+  "material": "Grave Dust",
+  "mythicalForm": "Underworld Feathered Serpent",
+  "survival": [
+    "Cold Body [Defense]",
+    "Undying Revival [Heal]"
+  ],
+  "role": "Necromancy / Healing / Execution",
+  "intro": "The Death pathway commands spirits, corpses and the boundary between life and death. It combines necromantic power with relentless attrition and survival tools.",
+  "meter": {
+    "name": "Soul",
+    "key": "soul",
+    "max": 100,
+    "gain": "Defeating foes and spirit contact",
+    "spend": "Undead and spirit techniques",
+    "full": "Next death effect is empowered",
+    "special": "Death Authority",
+    "characteristic": "Hybrid / Death",
+    "quirkName": "Death Authority",
+    "quirkText": "Combat-only death, revival and undead control."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Corpse Collector",
+      "ability": {
+        "id": "cold_body",
+        "name": "Cold Body",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Cold Body — Undead physiology: +10% Max HP, Rot/Cold Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "hp",
+            "amount": 0.1
+          },
+          {
+            "type": "resistance",
+            "values": {
+              "rot": 0.1,
+              "cold": 0.1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Grave Digger",
+      "ability": {
+        "id": "undying_touch",
+        "name": "Undying Touch",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Undying Touch — Deals 130% INT Death DMG and lowers target Speed by 15%.",
+        "stat": "INT",
+        "scale": 1.3,
+        "damageType": "death",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.15,
+            "stat": "speed",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Spirit Medium",
+      "ability": {
+        "id": "necromancy_summon",
+        "name": "Necromancy Summon",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 3,
+        "description": "Necromancy Summon — Summons skeleton soldier absorbing 15% Max HP damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.15,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Living Zombie",
+      "ability": {
+        "id": "spirit_body_door",
+        "name": "Spirit Body Door",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Spirit Body Door — Opens underworld gate dealing 160% INT Death DMG.",
+        "stat": "INT",
+        "scale": 1.6,
+        "damageType": "death",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Gatekeeper",
+      "ability": {
+        "id": "zombie_transformation",
+        "name": "Zombie Transformation",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Zombie Transformation — +25% DEF, physical slash resistance, deals 170% ATK Death DMG on hit.",
+        "stat": "ATK",
+        "scale": 1.7,
+        "damageType": "death",
+        "formula": "empowered_hybrid_physical",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "buff",
+            "amount": 0.25,
+            "stat": "def",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Undead",
+      "ability": {
+        "id": "undying_rebirth_aura",
+        "name": "Undying Rebirth Aura",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Undying Rebirth Aura — Envelops user in death aura, absorbing 25% Max HP damage and dealing 150% INT Death DMG to adjacent enemies.",
+        "stat": "INT",
+        "scale": 1.5,
+        "damageType": "death",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.25,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Ferryman",
+      "ability": {
+        "id": "underworld_domain",
+        "name": "Underworld Domain",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 4,
+        "description": "Underworld Domain — Pulls battlefield into Underworld, reducing enemy Speed and DEF by 20%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.2,
+            "stat": "def",
+            "duration": 2
+          },
+          {
+            "type": "debuff",
+            "amount": 0.2,
+            "stat": "speed",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Death Consort",
+      "ability": {
+        "id": "pale_emperor_gaze",
+        "name": "Pale Emperor Gaze",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Pale Emperor Gaze — Gaze of death dealing 280% INT Death DMG.",
+        "stat": "INT",
+        "scale": 2.8,
+        "damageType": "death",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Pale Emperor",
+      "ability": {
+        "id": "death_s_herald",
+        "name": "Death's Herald",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Death's Herald — Deals 320% INT Death DMG; executes targets below 15% HP.",
+        "stat": "INT",
+        "scale": 3.2,
+        "damageType": "death",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "execute",
+            "threshold": 0.15,
+            "multiplier": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Death",
+      "ability": {
+        "id": "eternal_death",
+        "name": "Eternal Death",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 125,
+        "cooldown": 5,
+        "description": "Eternal Death — Extinguishes all life forces in combat dealing 410% INT Death True DMG.",
+        "stat": "INT",
+        "scale": 4.1,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

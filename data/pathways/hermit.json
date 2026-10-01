@@ -1,0 +1,271 @@
+{
+  "schema": "pathway.v1",
+  "key": "hermit",
+  "name": "Hermit",
+  "group": "Knowledge & Wisdom",
+  "archetype": "Caster",
+  "material": "Star Parchment",
+  "mythicalForm": "Starlight Knowledge Serpent",
+  "survival": [
+    "Scroll Ward [Defense]",
+    "Information Reconstruction [Heal]"
+  ],
+  "role": "Caster",
+  "intro": "The Hermit pathway seeks hidden knowledge and mystical scholarship, wielding rituals, spells and arcane discoveries to solve problems or destroy enemies.",
+  "meter": {
+    "name": "Knowledge",
+    "key": "knowledge",
+    "max": 100,
+    "gain": "Investigating and witnessing powers",
+    "spend": "Scrolls and deep prying",
+    "full": "Next spell is empowered",
+    "special": "Knowledge",
+    "characteristic": "Caster",
+    "quirkName": "Starlight Knowledge Serpent",
+    "quirkText": "Survival: Scroll Ward [Defense], Information Reconstruction [Heal]"
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Mystery Pryer",
+      "ability": {
+        "id": "secret_vision",
+        "name": "Secret Vision",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Secret Vision — +10% INT, Mystic Curse Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "int",
+            "amount": 0.1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Melee Scholar",
+      "ability": {
+        "id": "mystic_spell",
+        "name": "Mystic Spell",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Mystic Spell — Deals 130% INT Magic DMG with random elemental effect.",
+        "stat": "INT",
+        "scale": 1.3,
+        "damageType": "mystic",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Warlock",
+      "ability": {
+        "id": "scroll_ward",
+        "name": "Scroll Ward",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 3,
+        "description": "Scroll Ward — Constructs scroll barrier absorbing 20% Max HP magic damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.2,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Scrolls Professor",
+      "ability": {
+        "id": "knowledge_arrow",
+        "name": "Knowledge Arrow",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Knowledge Arrow — Fires starlight arrow dealing 160% INT Light DMG; ignores 20% DEF.",
+        "stat": "INT",
+        "scale": 1.6,
+        "damageType": "elemental",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "defense_penetration",
+            "amount": 0.2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Constellations Master",
+      "ability": {
+        "id": "constellation_constrain",
+        "name": "Constellation Constrain",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Constellation Constrain — Binds target in star constellation, lowering Speed by 25% for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.25,
+            "stat": "speed",
+            "duration": 2
+          },
+          {
+            "type": "status",
+            "status": "bound",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Mysticologist",
+      "ability": {
+        "id": "fairy_tale_spell",
+        "name": "Fairy Tale Spell",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Fairy Tale Spell — Mystic fairy-tale spell dealing 180% INT Mystic DMG and polymorphing target for 1 round.",
+        "stat": "INT",
+        "scale": 1.8,
+        "damageType": "mystic",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "polymorphed",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Clairvoyant",
+      "ability": {
+        "id": "mystic_domain",
+        "name": "Mystic Domain",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 4,
+        "description": "Mystic Domain — Envelops arena in starlight domain, boosting user spell DMG by +20%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "outgoing_damage",
+            "amount": 0.2,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Sage",
+      "ability": {
+        "id": "scroll_gate",
+        "name": "Scroll Gate",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Scroll Gate — Deals 270% INT Mystic DMG and reflects 50% magic damage.",
+        "stat": "INT",
+        "scale": 2.7,
+        "damageType": "mystic",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "reflect",
+            "mode": "share",
+            "share": 0.5,
+            "duration": "next_turn"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Knowledge Emperor",
+      "ability": {
+        "id": "star_knowledge",
+        "name": "Star Knowledge",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Star Knowledge — Calls celestial starlight dealing 320% INT Light DMG.",
+        "stat": "INT",
+        "scale": 3.2,
+        "damageType": "elemental",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Hermit",
+      "ability": {
+        "id": "eye_of_knowledge",
+        "name": "Eye of Knowledge",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Eye of Knowledge — Unleashes ultimate secret knowledge dealing 400% INT True DMG.",
+        "stat": "INT",
+        "scale": 4.0,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

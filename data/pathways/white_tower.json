@@ -1,0 +1,290 @@
+{
+  "schema": "pathway.v1",
+  "key": "white_tower",
+  "name": "White Tower",
+  "group": "God Almighty",
+  "archetype": "Caster",
+  "material": "Ivory Quill",
+  "mythicalForm": "Eye of Knowledge Runic Tower",
+  "survival": [
+    "Predictive Guard [Defense]",
+    "Prophetic Evade [Escape]"
+  ],
+  "role": "Caster",
+  "intro": "The White Tower pathway pursues knowledge, deduction and rational understanding, turning accumulated information into versatile supernatural power.",
+  "meter": {
+    "name": "Deduction",
+    "key": "deduction",
+    "max": 100,
+    "gain": "Combat actions",
+    "spend": "Pathway abilities",
+    "full": "Next ability is empowered",
+    "special": "Deduction",
+    "characteristic": "Caster",
+    "quirkName": "Eye of Knowledge Runic Tower",
+    "quirkText": "Survival: Predictive Guard [Defense], Prophetic Evade [Escape]"
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Reader",
+      "ability": {
+        "id": "combat_analysis",
+        "name": "Combat Analysis",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Combat Analysis — +10% Hit Chance, +15% INT Spell Penetration.",
+        "stat": "INT",
+        "scale": 0.15,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "int",
+            "amount": 0.15
+          },
+          {
+            "type": "hitChance",
+            "amount": 0.1
+          },
+          {
+            "type": "spell_penetration",
+            "amount": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Student of Ratiocination",
+      "ability": {
+        "id": "spell_imitation",
+        "name": "Spell Imitation",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Spell Imitation — Copies and casts 1 basic elemental spell for 130% INT DMG.",
+        "stat": "INT",
+        "scale": 1.3,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Detective",
+      "ability": {
+        "id": "predictive_guard",
+        "name": "Predictive Guard",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Predictive Guard — Foresees spell vectors; reduces incoming magic spell damage taken by 20%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_taken",
+            "amount": -0.2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Polymath",
+      "ability": {
+        "id": "analysis_weakness",
+        "name": "Analysis Weakness",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 30,
+        "cooldown": 2,
+        "description": "Analysis Weakness — Analyzes target armor; user strikes bypass 30% DEF for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "defense_penetration",
+            "amount": 0.3,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Mysticism Magister",
+      "ability": {
+        "id": "prophetic_evade",
+        "name": "Prophetic Evade",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Prophetic Evade — Evades next incoming single-target skill completely.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "evade",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Prophet",
+      "ability": {
+        "id": "prophetic_intervention",
+        "name": "Prophetic Intervention",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Prophetic Intervention -- Foresees enemy attack vectors; until your next turn, nullifies incoming strikes and reflects 150% INT Magic DMG at each attacker.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "magic",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "reflect",
+            "mode": "stat",
+            "stat": "INT",
+            "multiplier": 1.5,
+            "element": "magic",
+            "negate": true,
+            "duration": "next_turn"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Cognizer",
+      "ability": {
+        "id": "omniscient_eye",
+        "name": "Omniscient Eye",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Omniscient Eye — +25% INT Spell Penetration and immunity to illusions.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "int",
+            "amount": 0.25
+          },
+          {
+            "type": "spell_penetration",
+            "amount": 0.25
+          },
+          {
+            "type": "immunity",
+            "status": "illusion"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Wisdom Angel",
+      "ability": {
+        "id": "magic_barrier",
+        "name": "Magic Barrier",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 80,
+        "cooldown": 4,
+        "description": "Magic Barrier — Constructs runic barrier absorbing 30% Max HP magic damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.3,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Omniscient Eye",
+      "ability": {
+        "id": "omniscient_rewrite",
+        "name": "Omniscient Rewrite",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 95,
+        "cooldown": 4,
+        "description": "Omniscient Rewrite — Rewrites target spell matrix, converting enemy spell into 280% INT healing for user.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "heal",
+            "scaling": "INT",
+            "multiplier": 2.8
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "White Tower",
+      "ability": {
+        "id": "divine_enlightenment",
+        "name": "Divine Enlightenment",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Divine Enlightenment — Omniscient enlightenment dealing 390% INT True Magic DMG.",
+        "stat": "INT",
+        "scale": 3.9,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

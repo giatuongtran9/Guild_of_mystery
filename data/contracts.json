@@ -1,0 +1,162 @@
+{
+  "QUEST_TEMPLATES": [
+    [
+      "A Missing Cat",
+      "Mrs. Eliza Bell, a seamstress in Whitechapel, arrives at the guild office in tears. Her black cat, Morrow, vanished before dawn. She cannot afford a private detective and asks the guild to search the alleys, courtyards and coal sheds nearby. The cat is frightened, not dangerous; this is a search and rescue contract.",
+      "normal"
+    ],
+    [
+      "The Stolen Heirloom",
+      "A respectable family claims a silver locket was stolen from a locked room. The owner suspects a servant, but the room shows signs of something stranger.",
+      "normal"
+    ],
+    [
+      "Murder at Bell House",
+      "A local constable asks the guild to discreetly investigate a murder before panic spreads. The victim's final note mentions a person who should not have been there.",
+      "mystery"
+    ],
+    [
+      "The Whispering Tenant",
+      "Residents of a boarding house report knocking from an empty room every midnight. The landlord wants the matter solved quietly.",
+      "mystery"
+    ],
+    [
+      "A Vanished Watchman",
+      "A night watchman disappeared while patrolling a quiet street. His lantern was found still burning beside a locked iron gate.",
+      "mystery"
+    ],
+    [
+      "The Chapel Below",
+      "A charitable chapel reports strange chanting beneath its foundations. The priest insists there is no basement, yet a staircase was discovered after midnight.",
+      "occult"
+    ],
+    [
+      "The Red Ledger",
+      "Several merchants received identical anonymous invoices for goods they never ordered. Those who ignored them later disappeared.",
+      "occult"
+    ]
+  ],
+  "tags": [
+    "investigation",
+    "urban",
+    "mystery",
+    "ritual",
+    "relic",
+    "dream",
+    "beast",
+    "cult"
+  ],
+  "WANTED_TARGETS": [
+    {
+      "target": "Elias Vane",
+      "path": "Unknown",
+      "threat": "★★★★☆",
+      "lastSeen": "South Wharf",
+      "story": "Three merchants have disappeared over the past two weeks. Their bodies were eventually discovered along the old canal, each bearing a single red cut across the throat. Witnesses describe a man wearing a dark travelling coat who asks merchants about their family before following them. The authorities believe Elias Vane is responsible for at least six murders. Yesterday, a dockworker survived an encounter with him and reported seeing supernatural abilities. The guild has been offered a substantial reward for his capture.",
+      "rewardFunds": 1250,
+      "rewardRep": 18,
+      "rewardMaterials": 3
+    },
+    {
+      "target": "Mara Quill",
+      "path": "Demoness",
+      "threat": "★★★★★",
+      "lastSeen": "Old Market",
+      "story": "Several disappearances have been linked to a woman who leaves black mirrors at the scene. Survivors report charms, poison and impossible reflections. The guild is asked to bring her in before another district is affected.",
+      "rewardFunds": 1600,
+      "rewardRep": 22,
+      "rewardMaterials": 3
+    },
+    {
+      "target": "Jonas Rook",
+      "path": "Error",
+      "threat": "★★★★☆",
+      "lastSeen": "Clockmaker’s Row",
+      "story": "A string of impossible thefts has left locked rooms empty without signs of entry. Witnesses describe a man who seems to make attacks and doors behave incorrectly. The authorities suspect supernatural interference.",
+      "rewardFunds": 1450,
+      "rewardRep": 20,
+      "rewardMaterials": 3
+    }
+  ],
+  "system": {
+    "mundane_max_reputation": 9,
+    "max_sequence_by_reputation": [
+      {
+        "min": 0,
+        "max": 9
+      },
+      {
+        "min": 15,
+        "max": 8
+      },
+      {
+        "min": 30,
+        "max": 7
+      },
+      {
+        "min": 50,
+        "max": 6
+      },
+      {
+        "min": 80,
+        "max": 5
+      }
+    ],
+    "mundane_base_chance": 0.48,
+    "lower_contract_weight": 0.5,
+    "sequence_odds_by_reputation": [
+      {
+        "min": 0,
+        "weights": {
+          "9": 70,
+          "8": 20,
+          "7": 8,
+          "6": 2,
+          "5": 0
+        }
+      },
+      {
+        "min": 15,
+        "weights": {
+          "9": 45,
+          "8": 35,
+          "7": 15,
+          "6": 5,
+          "5": 0
+        }
+      },
+      {
+        "min": 30,
+        "weights": {
+          "9": 25,
+          "8": 35,
+          "7": 25,
+          "6": 12,
+          "5": 3
+        }
+      },
+      {
+        "min": 50,
+        "weights": {
+          "9": 12,
+          "8": 28,
+          "7": 30,
+          "6": 22,
+          "5": 8
+        }
+      },
+      {
+        "min": 80,
+        "weights": {
+          "9": 7,
+          "8": 20,
+          "7": 28,
+          "6": 28,
+          "5": 17
+        }
+      }
+    ],
+    "sequence_odds_note": "Higher-reputation guilds shift contract-board weight toward higher-difficulty contracts, but Sequence 9 remains available at every reputation because low-sequence agents still need contracts for digestion and advancement. Odds are analogous to TFT tier odds: higher tiers become more common rather than lower tiers being hard-disabled.",
+    "sequence_9_always_available": true
+  }
+}

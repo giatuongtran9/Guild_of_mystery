@@ -1,0 +1,77 @@
+{
+  "version": "v16.0",
+  "weapons": {
+    "none": {
+      "id": "none",
+      "name": "Bare Hands",
+      "atk": 0,
+      "range": 1,
+      "kind": "unarmed",
+      "crit": 0,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0,
+      "text": "Normal close combat with bare hands."
+    },
+    "revolver": {
+      "id": "revolver",
+      "name": "Service Revolver",
+      "atk": 30,
+      "range": 18,
+      "kind": "gun",
+      "crit": 0.02,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0,
+      "text": "Powerful Victorian sidearm. Gun Mastery determines accuracy."
+    },
+    "pistol": {
+      "id": "pistol",
+      "name": "Pocket Pistol",
+      "atk": 26,
+      "range": 12,
+      "kind": "gun",
+      "crit": 0.01,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0,
+      "text": "Compact pistol with high damage but no innate accuracy bonus."
+    },
+    "sword": {
+      "id": "sword",
+      "name": "Service Sword",
+      "atk": 12,
+      "range": 2,
+      "kind": "weapon",
+      "crit": 0.03,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0.08,
+      "text": "Reliable sword. Weapon Mastery increases normal damage."
+    },
+    "knife": {
+      "id": "knife",
+      "name": "Fighting Knife",
+      "atk": 8,
+      "range": 1,
+      "kind": "weapon",
+      "crit": 0.04,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0.18,
+      "text": "Knife: +8 ATK and 18% chance to cause Bleed."
+    },
+    "club": {
+      "id": "club",
+      "name": "Heavy Club",
+      "atk": 10,
+      "range": 1,
+      "kind": "weapon",
+      "crit": 0.01,
+      "dodge": 0,
+      "miss": 0.04,
+      "bleed": 0,
+      "text": "Heavy blunt weapon with reliable impact."
+    }
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "schema": "pathway.v1",
+  "key": "twilight_giant",
+  "name": "Twilight Giant",
+  "group": "Eternal Darkness",
+  "archetype": "Physical",
+  "material": "Twilight Iron",
+  "mythicalForm": "Silver Dawn Colossus",
+  "survival": [
+    "Martial Mastery [Defense]",
+    "Dawn Shield [Defense]"
+  ],
+  "role": "Tank / Weapon Master / Physical",
+  "intro": "The Twilight Giant pathway is the archetype of overwhelming physical strength, defense and combat authority. Its later sequences become terrifying engines of destruction.",
+  "meter": {
+    "name": "Resolve",
+    "key": "resolve",
+    "max": 100,
+    "gain": "Taking damage or protecting allies",
+    "spend": "Holy and decay techniques",
+    "full": "Next holy strike is empowered",
+    "special": "Resolve",
+    "characteristic": "Body / Martial",
+    "quirkName": "Martial Authority",
+    "quirkText": "Combat-only weapon mastery and physical durability."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Warrior",
+      "ability": {
+        "id": "martial_mastery",
+        "name": "Martial Mastery",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Martial Mastery — +15% Physical ATK and +10% DEF armor.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "def",
+            "amount": 0.1
+          },
+          {
+            "type": "stat_modifier",
+            "stat": "atk",
+            "amount": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Pugilist",
+      "ability": {
+        "id": "heavy_cleave",
+        "name": "Heavy Cleave",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Heavy Cleave — Deals 145% ATK Physical DMG; ignores 15% DEF.",
+        "stat": "ATK",
+        "scale": 1.45,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "defense_penetration",
+            "amount": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Weapon Master",
+      "ability": {
+        "id": "dawn_shield",
+        "name": "Dawn Shield",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 3,
+        "description": "Dawn Shield — Constructs radiant shield absorbing 20% Max HP damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.2,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Dawn Knight",
+      "ability": {
+        "id": "light_of_dawn",
+        "name": "Light of Dawn",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Light of Dawn — Deals 160% ATK Light DMG and cleanses minor debuffs.",
+        "stat": "ATK",
+        "scale": 1.6,
+        "damageType": "elemental",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "cleanse",
+            "duration": 0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Guardian",
+      "ability": {
+        "id": "guardian_stance",
+        "name": "Guardian Stance",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Guardian Stance — +30% DEF armor, taunts enemy, reduces incoming damage by 20%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "buff",
+            "stat": "def",
+            "amount": 0.3,
+            "duration": 2
+          },
+          {
+            "type": "damage_taken",
+            "amount": -0.2,
+            "duration": "next_turn"
+          },
+          {
+            "type": "taunt",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Demon Hunter",
+      "ability": {
+        "id": "dawn_guardian_barrier",
+        "name": "Dawn Guardian Barrier",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Dawn Guardian Barrier — Constructs a radiant barrier granting user +25% DEF and a 20% Max HP Shield.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "buff",
+            "amount": 0.25,
+            "stat": "def",
+            "duration": 2
+          },
+          {
+            "type": "shield",
+            "maxHpRatio": 0.2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Silver Knight",
+      "ability": {
+        "id": "giant_s_might",
+        "name": "Giant's Might",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Giant's Might — +20% Max HP and physical blunt damage resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "hp",
+            "amount": 0.2
+          },
+          {
+            "type": "resistance",
+            "values": {
+              "physical": 0.2,
+              "blunt": 0.2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Glory Knight",
+      "ability": {
+        "id": "sword_of_twilight",
+        "name": "Sword of Twilight",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Sword of Twilight — Swings twilight blade dealing 270% ATK Physical/Decay DMG.",
+        "stat": "ATK",
+        "scale": 2.7,
+        "damageType": "decay",
+        "formula": "empowered_hybrid_physical",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "God of Combat",
+      "ability": {
+        "id": "twilight_decay",
+        "name": "Twilight Decay",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Twilight Decay — Deals 330% ATK Decay DMG and lowers target DEF by 30%.",
+        "stat": "ATK",
+        "scale": 3.3,
+        "damageType": "decay",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.3,
+            "stat": "def",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Twilight Giant",
+      "ability": {
+        "id": "twilight_colossus",
+        "name": "Twilight Colossus",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 125,
+        "cooldown": 5,
+        "description": "Twilight Colossus — Transforms into giant colossus dealing 420% ATK Decay True DMG.",
+        "stat": "ATK",
+        "scale": 4.2,
+        "damageType": "true",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

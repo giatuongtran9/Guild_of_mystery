@@ -1,0 +1,1815 @@
+{
+  "version": "v16.0",
+  "base_stat_profiles": {
+    "door": {
+      "hp": 1.18,
+      "atk": 1.08,
+      "def": 1.12,
+      "int": 1.72
+    },
+    "twilight_giant": {
+      "hp": 1.48,
+      "atk": 1.52,
+      "def": 1.48,
+      "int": 1.1
+    },
+    "visionary": {
+      "hp": 1.1,
+      "atk": 1.08,
+      "def": 1.1,
+      "int": 1.95
+    },
+    "red_priest": {
+      "hp": 1.36,
+      "atk": 1.52,
+      "def": 1.3,
+      "int": 1.12
+    },
+    "demoness": {
+      "hp": 1.2,
+      "atk": 1.45,
+      "def": 1.16,
+      "int": 1.55
+    },
+    "hermit": {
+      "hp": 1.06,
+      "atk": 1.02,
+      "def": 1.06,
+      "int": 1.9
+    },
+    "wheel_of_fortune": {
+      "hp": 1.22,
+      "atk": 1.1,
+      "def": 1.22,
+      "int": 1.58
+    },
+    "tyrant": {
+      "hp": 1.46,
+      "atk": 1.48,
+      "def": 1.42,
+      "int": 1.12
+    },
+    "sun": {
+      "hp": 1.38,
+      "atk": 1.43,
+      "def": 1.42,
+      "int": 1.58
+    },
+    "fool": {
+      "hp": 1.14,
+      "atk": 1.08,
+      "def": 1.12,
+      "int": 1.82
+    }
+  },
+  "path_growth": {
+    "door": {
+      "hp": 1.025,
+      "atk": 1.02,
+      "def": 1.025,
+      "int": 1.14
+    },
+    "twilight_giant": {
+      "hp": 1.075,
+      "atk": 1.085,
+      "def": 1.08,
+      "int": 1.025
+    },
+    "visionary": {
+      "hp": 1.015,
+      "atk": 1.015,
+      "def": 1.015,
+      "int": 1.16
+    },
+    "red_priest": {
+      "hp": 1.065,
+      "atk": 1.08,
+      "def": 1.055,
+      "int": 1.025
+    },
+    "demoness": {
+      "hp": 1.025,
+      "atk": 1.06,
+      "def": 1.025,
+      "int": 1.1
+    },
+    "hermit": {
+      "hp": 1.012,
+      "atk": 1.01,
+      "def": 1.012,
+      "int": 1.17
+    },
+    "wheel_of_fortune": {
+      "hp": 1.025,
+      "atk": 1.02,
+      "def": 1.025,
+      "int": 1.12
+    },
+    "tyrant": {
+      "hp": 1.07,
+      "atk": 1.075,
+      "def": 1.06,
+      "int": 1.025
+    },
+    "sun": {
+      "hp": 1.055,
+      "atk": 1.065,
+      "def": 1.055,
+      "int": 1.08
+    },
+    "fool": {
+      "hp": 1.02,
+      "atk": 1.02,
+      "def": 1.02,
+      "int": 1.15
+    },
+    "error": {
+      "hp": 1.045,
+      "atk": 1.07,
+      "def": 1.04,
+      "int": 1.0625
+    },
+    "white_tower": {
+      "hp": 1.0253,
+      "atk": 1.025,
+      "def": 1.0253,
+      "int": 1.1367
+    },
+    "hanged_man": {
+      "hp": 1.0725,
+      "atk": 1.08,
+      "def": 1.07,
+      "int": 1.025
+    },
+    "darkness": {
+      "hp": 1.045,
+      "atk": 1.07,
+      "def": 1.04,
+      "int": 1.0625
+    },
+    "death": {
+      "hp": 1.0725,
+      "atk": 1.08,
+      "def": 1.07,
+      "int": 1.025
+    },
+    "paragon": {
+      "hp": 1.0253,
+      "atk": 1.025,
+      "def": 1.0253,
+      "int": 1.1367
+    },
+    "mother": {
+      "hp": 1.0725,
+      "atk": 1.08,
+      "def": 1.07,
+      "int": 1.025
+    },
+    "moon": {
+      "hp": 1.0253,
+      "atk": 1.025,
+      "def": 1.0253,
+      "int": 1.1367
+    },
+    "abyss": {
+      "hp": 1.045,
+      "atk": 1.07,
+      "def": 1.04,
+      "int": 1.0625
+    },
+    "chained": {
+      "hp": 1.0725,
+      "atk": 1.08,
+      "def": 1.07,
+      "int": 1.025
+    },
+    "black_emperor": {
+      "hp": 1.045,
+      "atk": 1.07,
+      "def": 1.04,
+      "int": 1.0625
+    },
+    "justiciar": {
+      "hp": 1.0725,
+      "atk": 1.08,
+      "def": 1.07,
+      "int": 1.025
+    }
+  },
+  "stat_table": {
+    "0": {
+      "Physical": [
+        280000,
+        11200,
+        7200,
+        5500,
+        145
+      ],
+      "Agility": [
+        240000,
+        10200,
+        6200,
+        9500,
+        170
+      ],
+      "Caster": [
+        210000,
+        8800,
+        5400,
+        13800,
+        148
+      ]
+    },
+    "1": {
+      "Physical": [
+        88000,
+        3900,
+        2350,
+        1850,
+        135
+      ],
+      "Agility": [
+        78000,
+        3600,
+        2000,
+        3200,
+        160
+      ],
+      "Caster": [
+        70000,
+        3000,
+        1780,
+        4700,
+        138
+      ]
+    },
+    "2": {
+      "Physical": [
+        38000,
+        2080,
+        1250,
+        1000,
+        130
+      ],
+      "Agility": [
+        34000,
+        1880,
+        1080,
+        1720,
+        150
+      ],
+      "Caster": [
+        30000,
+        1550,
+        950,
+        2550,
+        132
+      ]
+    },
+    "3": {
+      "Physical": [
+        16500,
+        1080,
+        650,
+        520,
+        125
+      ],
+      "Agility": [
+        15000,
+        980,
+        560,
+        900,
+        142
+      ],
+      "Caster": [
+        13200,
+        820,
+        490,
+        1350,
+        126
+      ]
+    },
+    "4": {
+      "Physical": [
+        8800,
+        640,
+        380,
+        300,
+        122
+      ],
+      "Agility": [
+        8000,
+        580,
+        330,
+        520,
+        138
+      ],
+      "Caster": [
+        7100,
+        480,
+        288,
+        780,
+        122
+      ]
+    },
+    "5": {
+      "Physical": [
+        3900,
+        330,
+        190,
+        160,
+        118
+      ],
+      "Agility": [
+        3600,
+        295,
+        165,
+        270,
+        130
+      ],
+      "Caster": [
+        3200,
+        240,
+        140,
+        400,
+        118
+      ]
+    },
+    "6": {
+      "Physical": [
+        2400,
+        210,
+        125,
+        105,
+        115
+      ],
+      "Agility": [
+        2200,
+        190,
+        110,
+        175,
+        125
+      ],
+      "Caster": [
+        1980,
+        155,
+        92,
+        255,
+        114
+      ]
+    },
+    "7": {
+      "Physical": [
+        1450,
+        135,
+        80,
+        70,
+        110
+      ],
+      "Agility": [
+        1350,
+        122,
+        70,
+        115,
+        120
+      ],
+      "Caster": [
+        1220,
+        100,
+        60,
+        165,
+        110
+      ]
+    },
+    "8": {
+      "Physical": [
+        950,
+        90,
+        55,
+        50,
+        108
+      ],
+      "Agility": [
+        880,
+        82,
+        48,
+        75,
+        115
+      ],
+      "Caster": [
+        820,
+        68,
+        42,
+        110,
+        106
+      ]
+    },
+    "9": {
+      "Physical": [
+        580,
+        58,
+        36,
+        35,
+        105
+      ],
+      "Agility": [
+        550,
+        54,
+        32,
+        50,
+        110
+      ],
+      "Caster": [
+        520,
+        46,
+        28,
+        72,
+        102
+      ]
+    }
+  },
+  "path_archetype": {
+    "fool": "Caster",
+    "door": "Caster",
+    "error": "Agility",
+    "visionary": "Caster",
+    "sun": "Caster",
+    "tyrant": "Physical",
+    "darkness": "Agility",
+    "death": "Physical",
+    "twilight_giant": "Physical",
+    "red_priest": "Agility",
+    "demoness": "Agility",
+    "black_emperor": "Agility",
+    "justiciar": "Physical",
+    "white_tower": "Caster",
+    "hanged_man": "Physical",
+    "hermit": "Caster",
+    "paragon": "Caster",
+    "wheel_of_fortune": "Caster",
+    "mother": "Physical",
+    "moon": "Caster",
+    "abyss": "Agility",
+    "chained": "Physical"
+  },
+  "combat_balance": {
+    "enemyDamage": 1.9,
+    "enemyDamageIndividual": 1.0,
+    "enemyDamageParty": 1.5
+  },
+  "archetype_stat_progression": {
+    "Physical": {
+      "Seq 9": {
+        "hp": 580,
+        "atk": 58,
+        "def": 36,
+        "int": 35,
+        "spd": 105,
+        "max_sp": 117,
+        "sp_regen": 11
+      },
+      "Seq 8": {
+        "hp": 950,
+        "atk": 90,
+        "def": 55,
+        "int": 50,
+        "spd": 108,
+        "max_sp": 125,
+        "sp_regen": 12
+      },
+      "Seq 7": {
+        "hp": 1450,
+        "atk": 135,
+        "def": 80,
+        "int": 70,
+        "spd": 110,
+        "max_sp": 135,
+        "sp_regen": 13
+      },
+      "Seq 6": {
+        "hp": 2400,
+        "atk": 210,
+        "def": 125,
+        "int": 105,
+        "spd": 115,
+        "max_sp": 152,
+        "sp_regen": 15
+      },
+      "Seq 5": {
+        "hp": 3900,
+        "atk": 330,
+        "def": 190,
+        "int": 160,
+        "spd": 118,
+        "max_sp": 180,
+        "sp_regen": 18
+      },
+      "Seq 4": {
+        "hp": 8800,
+        "atk": 640,
+        "def": 380,
+        "int": 300,
+        "spd": 122,
+        "max_sp": 250,
+        "sp_regen": 25
+      },
+      "Seq 3": {
+        "hp": 16500,
+        "atk": 1080,
+        "def": 650,
+        "int": 520,
+        "spd": 125,
+        "max_sp": 360,
+        "sp_regen": 36
+      },
+      "Seq 2": {
+        "hp": 38000,
+        "atk": 2080,
+        "def": 1250,
+        "int": 1000,
+        "spd": 130,
+        "max_sp": 600,
+        "sp_regen": 60
+      },
+      "Seq 1": {
+        "hp": 88000,
+        "atk": 3900,
+        "def": 2350,
+        "int": 1850,
+        "spd": 135,
+        "max_sp": 1025,
+        "sp_regen": 102
+      },
+      "Seq 0": {
+        "hp": 280000,
+        "atk": 11200,
+        "def": 7200,
+        "int": 5500,
+        "spd": 145,
+        "max_sp": 2850,
+        "sp_regen": 285
+      }
+    },
+    "Agility": {
+      "Seq 9": {
+        "hp": 550,
+        "atk": 54,
+        "def": 32,
+        "int": 50,
+        "spd": 110,
+        "max_sp": 125,
+        "sp_regen": 12
+      },
+      "Seq 8": {
+        "hp": 880,
+        "atk": 82,
+        "def": 48,
+        "int": 75,
+        "spd": 115,
+        "max_sp": 137,
+        "sp_regen": 13
+      },
+      "Seq 7": {
+        "hp": 1350,
+        "atk": 122,
+        "def": 70,
+        "int": 115,
+        "spd": 120,
+        "max_sp": 157,
+        "sp_regen": 15
+      },
+      "Seq 6": {
+        "hp": 2200,
+        "atk": 190,
+        "def": 110,
+        "int": 175,
+        "spd": 125,
+        "max_sp": 187,
+        "sp_regen": 18
+      },
+      "Seq 5": {
+        "hp": 3600,
+        "atk": 295,
+        "def": 165,
+        "int": 270,
+        "spd": 130,
+        "max_sp": 235,
+        "sp_regen": 23
+      },
+      "Seq 4": {
+        "hp": 8000,
+        "atk": 580,
+        "def": 330,
+        "int": 520,
+        "spd": 138,
+        "max_sp": 360,
+        "sp_regen": 36
+      },
+      "Seq 3": {
+        "hp": 15000,
+        "atk": 980,
+        "def": 560,
+        "int": 900,
+        "spd": 142,
+        "max_sp": 550,
+        "sp_regen": 55
+      },
+      "Seq 2": {
+        "hp": 34000,
+        "atk": 1880,
+        "def": 1080,
+        "int": 1720,
+        "spd": 150,
+        "max_sp": 960,
+        "sp_regen": 96
+      },
+      "Seq 1": {
+        "hp": 78000,
+        "atk": 3600,
+        "def": 2000,
+        "int": 3200,
+        "spd": 160,
+        "max_sp": 1700,
+        "sp_regen": 170
+      },
+      "Seq 0": {
+        "hp": 240000,
+        "atk": 10200,
+        "def": 6200,
+        "int": 9500,
+        "spd": 170,
+        "max_sp": 4850,
+        "sp_regen": 485
+      }
+    },
+    "Caster": {
+      "Seq 9": {
+        "hp": 520,
+        "atk": 46,
+        "def": 28,
+        "int": 72,
+        "spd": 102,
+        "max_sp": 136,
+        "sp_regen": 13
+      },
+      "Seq 8": {
+        "hp": 820,
+        "atk": 68,
+        "def": 42,
+        "int": 110,
+        "spd": 106,
+        "max_sp": 155,
+        "sp_regen": 15
+      },
+      "Seq 7": {
+        "hp": 1220,
+        "atk": 100,
+        "def": 60,
+        "int": 165,
+        "spd": 110,
+        "max_sp": 182,
+        "sp_regen": 18
+      },
+      "Seq 6": {
+        "hp": 1980,
+        "atk": 155,
+        "def": 92,
+        "int": 255,
+        "spd": 114,
+        "max_sp": 227,
+        "sp_regen": 22
+      },
+      "Seq 5": {
+        "hp": 3200,
+        "atk": 240,
+        "def": 140,
+        "int": 400,
+        "spd": 118,
+        "max_sp": 300,
+        "sp_regen": 30
+      },
+      "Seq 4": {
+        "hp": 7100,
+        "atk": 480,
+        "def": 288,
+        "int": 780,
+        "spd": 122,
+        "max_sp": 490,
+        "sp_regen": 49
+      },
+      "Seq 3": {
+        "hp": 13200,
+        "atk": 820,
+        "def": 490,
+        "int": 1350,
+        "spd": 126,
+        "max_sp": 775,
+        "sp_regen": 77
+      },
+      "Seq 2": {
+        "hp": 30000,
+        "atk": 1550,
+        "def": 950,
+        "int": 2550,
+        "spd": 132,
+        "max_sp": 1375,
+        "sp_regen": 137
+      },
+      "Seq 1": {
+        "hp": 70000,
+        "atk": 3000,
+        "def": 1780,
+        "int": 4700,
+        "spd": 138,
+        "max_sp": 2450,
+        "sp_regen": 245
+      },
+      "Seq 0": {
+        "hp": 210000,
+        "atk": 8800,
+        "def": 5400,
+        "int": 13800,
+        "spd": 148,
+        "max_sp": 7000,
+        "sp_regen": 700
+      }
+    }
+  },
+  "element_resistance_rules": {
+    "elements": [
+      "physical",
+      "fire",
+      "water",
+      "lightning",
+      "frost",
+      "holy",
+      "dark",
+      "death",
+      "nature",
+      "blood",
+      "poison",
+      "corrosion",
+      "mystic",
+      "psychic",
+      "decay",
+      "disorder",
+      "fate",
+      "piercing",
+      "shadow",
+      "magma",
+      "metaphysical",
+      "spatial",
+      "magic"
+    ],
+    "default_resistance": 0,
+    "formula": "final = raw * (1 - resistance/100)",
+    "true_damage_bypasses_resistance": true,
+    "max_positive_resistance": 90,
+    "min_resistance": -100,
+    "path_resistances": {
+      "tyrant": {
+        "lightning": 15,
+        "water": 15
+      },
+      "sun": {
+        "holy": 20,
+        "fire": 10
+      },
+      "darkness": {
+        "dark": 20,
+        "psychic": 10
+      },
+      "death": {
+        "death": 20,
+        "dark": 10
+      },
+      "demoness": {
+        "frost": 15,
+        "poison": 15,
+        "dark": 10
+      },
+      "abyss": {
+        "fire": 20,
+        "magma": 20,
+        "corrosion": 10
+      },
+      "chained": {
+        "dark": 15,
+        "corrosion": 15
+      },
+      "moon": {
+        "blood": 20,
+        "dark": 10
+      },
+      "mother": {
+        "nature": 20
+      },
+      "red_priest": {
+        "fire": 20
+      },
+      "twilight_giant": {
+        "decay": 15,
+        "physical": 10
+      },
+      "hanged_man": {
+        "shadow": 15,
+        "blood": 15
+      },
+      "fool": {
+        "metaphysical": 10
+      },
+      "door": {
+        "spatial": 20
+      },
+      "error": {
+        "corrosion": 15
+      },
+      "visionary": {
+        "psychic": 20
+      },
+      "black_emperor": {
+        "disorder": 20
+      },
+      "justiciar": {
+        "piercing": 15
+      },
+      "white_tower": {
+        "magic": 15
+      },
+      "hermit": {
+        "mystic": 20
+      },
+      "paragon": {
+        "magic": 15
+      },
+      "wheel_of_fortune": {
+        "fate": 20
+      }
+    },
+    "aliases": {
+      "crimson": "blood",
+      "slashing": "physical"
+    }
+  },
+  "system": {
+    "version": "v17.0",
+    "save_version": 9,
+    "save_key": "guild-rpg-browser-v9",
+    "digestion": {
+      "contract_base_by_difficulty": {
+        "sequence_9": 24,
+        "sequence_8": 22,
+        "sequence_7": 20,
+        "sequence_6": 18,
+        "sequence_5_or_lower": 16
+      },
+      "individual_multiplier": 1.45,
+      "lower_sequence_bonus_per_step": 0.22
+    },
+    "weapon_mastery": {
+      "per_completed_contract": 2,
+      "max_level": 10
+    },
+    "combat": "json-driven-elemental-pipeline"
+  },
+  "pathway_advancement_costs": {
+    "fool": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "door": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "error": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "visionary": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "sun": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "tyrant": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "darkness": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "death": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "twilight_giant": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "red_priest": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "demoness": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "black_emperor": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "justiciar": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "white_tower": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "hanged_man": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "hermit": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "paragon": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "wheel_of_fortune": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "mother": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "moon": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "abyss": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    },
+    "chained": {
+      "9": {
+        "funds": 120,
+        "material": 0
+      },
+      "8": {
+        "funds": 166,
+        "material": 1
+      },
+      "7": {
+        "funds": 229,
+        "material": 1
+      },
+      "6": {
+        "funds": 315,
+        "material": 2
+      },
+      "5": {
+        "funds": 435,
+        "material": 2
+      },
+      "4": {
+        "funds": 601,
+        "material": 2
+      },
+      "3": {
+        "funds": 829,
+        "material": 2
+      },
+      "2": {
+        "funds": 1144,
+        "material": 2
+      },
+      "1": {
+        "funds": 1578,
+        "material": 2
+      },
+      "0": {
+        "funds": 2178,
+        "material": 2
+      }
+    }
+  },
+  "effect_durations": {
+    "buff": 2,
+    "debuff": 2,
+    "steal_stat": 2,
+    "vulnerability": 2,
+    "outgoing_damage": 2,
+    "dodge": 2,
+    "counter": 2,
+    "damage_taken": "next_turn",
+    "reflect": "next_turn",
+    "taunt": 2,
+    "defense_penetration": 2,
+    "debuff_hit": 1
+  }
+}

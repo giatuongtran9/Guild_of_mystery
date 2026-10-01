@@ -1,0 +1,297 @@
+{
+  "schema": "pathway.v1",
+  "key": "mother",
+  "name": "Mother",
+  "group": "Life & Fate",
+  "archetype": "Physical",
+  "material": "Life Seed",
+  "mythicalForm": "Primordial Tree of Life Avatar",
+  "survival": [
+    "Earthy Vitality [Heal]",
+    "Life Bloom [Heal]"
+  ],
+  "role": "Physical",
+  "intro": "The Mother pathway governs life, plants, healing and natural transformation. It excels at regeneration, sustained support and biological or environmental control.",
+  "meter": {
+    "name": "Vitality",
+    "key": "vitality",
+    "max": 100,
+    "gain": "Combat actions",
+    "spend": "Pathway abilities",
+    "full": "Next ability is empowered",
+    "special": "Vitality",
+    "characteristic": "Physical",
+    "quirkName": "Primordial Tree of Life Avatar",
+    "quirkText": "Survival: Earthy Vitality [Heal], Life Bloom [Heal]"
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Planter",
+      "ability": {
+        "id": "earthy_vitality",
+        "name": "Earthy Vitality",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Earthy Vitality — +15% Max HP, Poison & Blunt Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "hp",
+            "amount": 0.15
+          },
+          {
+            "type": "resistance",
+            "values": {
+              "poison": 0.15,
+              "blunt": 0.15
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Doctor",
+      "ability": {
+        "id": "nature_growth",
+        "name": "Nature Growth",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Nature Growth — Deals 135% ATK Physical/Nature DMG.",
+        "stat": "ATK",
+        "scale": 1.35,
+        "damageType": "nature",
+        "formula": "empowered_hybrid_physical",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Harvest Priest",
+      "ability": {
+        "id": "harvest_blessing",
+        "name": "Harvest Blessing",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 3,
+        "description": "Harvest Blessing — Regenerates 15% Max HP over 2 turns.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.15,
+            "scaling": "INT",
+            "multiplier": 0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Biologist",
+      "ability": {
+        "id": "life_seed",
+        "name": "Life Seed",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Life Seed — Plants life seed dealing 160% ATK DMG and healing user for 10% damage dealt.",
+        "stat": "ATK",
+        "scale": 1.6,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "heal_damage_ratio",
+            "amount": 0.1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Druid",
+      "ability": {
+        "id": "life_bloom",
+        "name": "Life Bloom",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Life Bloom — Restores 20% Max HP to user.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.2,
+            "scaling": "INT",
+            "multiplier": 0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Classical Alchemist",
+      "ability": {
+        "id": "nature_s_growth_surge",
+        "name": "Nature's Growth Surge",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Nature's Growth Surge — Summons giant thorn vines that bind target for 1 round while healing user for 15% Max HP.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.15,
+            "scaling": "INT",
+            "multiplier": 0
+          },
+          {
+            "type": "status",
+            "status": "bound",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Pallbearer",
+      "ability": {
+        "id": "flesh_mutation",
+        "name": "Flesh Mutation",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 65,
+        "cooldown": 4,
+        "description": "Flesh Mutation — +25% DEF armor, reflects 30% physical damage back to attacker.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "buff",
+            "stat": "def",
+            "amount": 0.25,
+            "duration": 2
+          },
+          {
+            "type": "reflect",
+            "mode": "share",
+            "share": 0.3,
+            "duration": "next_turn"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Desolate Matriarch",
+      "ability": {
+        "id": "mother_s_touch",
+        "name": "Mother's Touch",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Mother's Touch — Restores 30% Max HP and cleanses all negative status effects.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.3,
+            "scaling": "INT",
+            "multiplier": 0
+          },
+          {
+            "type": "cleanse",
+            "duration": 0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Naturewalker",
+      "ability": {
+        "id": "creation_domain",
+        "name": "Creation Domain",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Creation Domain — Unleashes nature growth dealing 310% ATK Nature DMG.",
+        "stat": "ATK",
+        "scale": 3.1,
+        "damageType": "nature",
+        "formula": "empowered_hybrid_physical",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Mother",
+      "ability": {
+        "id": "origin_of_life",
+        "name": "Origin of Life",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 125,
+        "cooldown": 5,
+        "description": "Origin of Life — Calls primordial life force dealing 410% ATK True DMG while fully restoring HP once.",
+        "stat": "ATK",
+        "scale": 4.1,
+        "damageType": "true",
+        "formula": "empowered_hybrid_physical",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 1,
+            "scaling": "INT",
+            "multiplier": 0
+          },
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

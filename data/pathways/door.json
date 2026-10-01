@@ -1,0 +1,308 @@
+{
+  "schema": "pathway.v1",
+  "key": "door",
+  "name": "Door",
+  "group": "Lord of Mysteries",
+  "archetype": "Caster",
+  "material": "Traveler's Ink",
+  "mythicalForm": "Cluster of Starry Door Handles",
+  "survival": [
+    "Blink Strike [Escape]",
+    "Spatial Concealment [Escape]"
+  ],
+  "role": "Teleportation / Evasion / Exile",
+  "intro": "The Door pathway specializes in travel, spatial manipulation, sealing and escape. Its Beyonders excel at movement, recording powers and crossing supernatural boundaries.",
+  "meter": {
+    "name": "Records",
+    "key": "records",
+    "max": 100,
+    "gain": "Witnessing abilities and investigations",
+    "spend": "Recording and portal effects",
+    "full": "Next recording is empowered",
+    "special": "Spatial Charge",
+    "characteristic": "Spirit / Space",
+    "quirkName": "Spatial Authority",
+    "quirkText": "Combat-only spatial control."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Apprentice",
+      "ability": {
+        "id": "phase_slip",
+        "name": "Phase Slip",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Phase Slip — +8% Dodge Rate. Grants Spatial & Displacement Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "dodge",
+            "amount": 0.08
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Trickmaster",
+      "ability": {
+        "id": "elemental_spark",
+        "name": "Elemental Spark",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Elemental Spark — Deals 130% INT elemental damage with a 35% chance to Freeze, Burn, or Stun.",
+        "stat": "INT",
+        "scale": 1.3,
+        "damageType": "elemental",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status_chance",
+            "status": "stunned",
+            "chance": 0.35,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Astrologer",
+      "ability": {
+        "id": "astrological_trajectory",
+        "name": "Astrological Trajectory",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Astrological Trajectory — Predicts strike paths; party gains +10% Hit Chance and +10% Critical DMG.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "hitChance",
+            "amount": 0.1
+          },
+          {
+            "type": "crit",
+            "amount": 0.1
+          },
+          {
+            "type": "critDamage",
+            "amount": 0.1
+          },
+          {
+            "type": "targeting",
+            "mode": "all_allies"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Scribe",
+      "ability": {
+        "id": "combat_record",
+        "name": "Combat Record",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Combat Record — Records 1 enemy skill executed in combat and replays it immediately at 100% scaling.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "execute",
+            "threshold": 0.25,
+            "multiplier": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Traveler",
+      "ability": {
+        "id": "blink_strike",
+        "name": "Blink Strike",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 2,
+        "description": "Blink Strike — Teleports behind enemy for 160% ATK/INT critical DMG while dodging single-target skills for 1 round.",
+        "stat": "ATK",
+        "scale": 1.6,
+        "damageType": "elemental",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "crit_bonus",
+            "amount": 0.2
+          },
+          {
+            "type": "status",
+            "status": "evade",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Secrets Sorcerer",
+      "ability": {
+        "id": "door_of_concealment",
+        "name": "Door of Concealment",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Door of Concealment — Traps enemy skills in spatial concealment (170% INT Spatial DMG + 1-round spell silence).",
+        "stat": "INT",
+        "scale": 1.7,
+        "damageType": "spatial",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "silenced",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Wanderer",
+      "ability": {
+        "id": "spatial_concealment",
+        "name": "Spatial Concealment",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 3,
+        "description": "Spatial Concealment — Conceals user in a pocket dimension for 1 round (untargetable & immune).",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Escape",
+        "effects": [
+          {
+            "type": "status",
+            "status": "untargetable",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Planeswalker",
+      "ability": {
+        "id": "spatial_exile",
+        "name": "Spatial Exile",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Spatial Exile — Banishes 1 enemy into a spatial fold for 1 round, removing them from combat.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "banished",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Key of Stars",
+      "ability": {
+        "id": "star_gate_tear",
+        "name": "Star Gate Tear",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Star Gate Tear — Opens a celestial tear dealing 300% INT AoE damage; reduces enemy ATK & DEF by 25%.",
+        "stat": "INT",
+        "scale": 3.0,
+        "damageType": "elemental",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.25,
+            "stat": "atk",
+            "duration": 2
+          },
+          {
+            "type": "debuff",
+            "amount": 0.25,
+            "stat": "def",
+            "duration": 2
+          },
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "The Door",
+      "ability": {
+        "id": "conceptual_unseal_seal",
+        "name": "Conceptual Unseal & Seal",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Conceptual Unseal & Seal — Strips enemy barriers and seals active skills for 1 round + 400% INT True DMG.",
+        "stat": "INT",
+        "scale": 4.0,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          },
+          {
+            "type": "strip_buffs"
+          }
+        ]
+      }
+    }
+  ]
+}

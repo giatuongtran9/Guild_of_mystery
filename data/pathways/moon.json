@@ -1,0 +1,288 @@
+{
+  "schema": "pathway.v1",
+  "key": "moon",
+  "name": "Moon",
+  "group": "Life & Fate",
+  "archetype": "Caster",
+  "material": "Crimson Moonstone",
+  "mythicalForm": "Crimson Vampire Bat Beast",
+  "survival": [
+    "Healing Touch [Heal]",
+    "Blood Siphon [Heal]"
+  ],
+  "role": "Caster",
+  "intro": "The Moon pathway uses medicine, blood, beasts and lunar power. It combines healing and enhancement with dangerous biological and vampiric abilities.",
+  "meter": {
+    "name": "Blood Moon",
+    "key": "bloodMoon",
+    "max": 100,
+    "gain": "Combat actions",
+    "spend": "Pathway abilities",
+    "full": "Next ability is empowered",
+    "special": "Blood Moon",
+    "characteristic": "Caster",
+    "quirkName": "Crimson Vampire Bat Beast",
+    "quirkText": "Survival: Healing Touch [Heal], Blood Siphon [Heal]"
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Apothecary",
+      "ability": {
+        "id": "healing_touch",
+        "name": "Healing Touch",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 2,
+        "description": "Healing Touch — Restores 12% Max HP to user.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.12,
+            "scaling": "INT",
+            "multiplier": 0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Beast Tamer",
+      "ability": {
+        "id": "vampiric_claws",
+        "name": "Vampiric Claws",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 20,
+        "cooldown": 1,
+        "description": "Vampiric Claws — Deals 135% INT Blood DMG with 25% Lifesteal.",
+        "stat": "INT",
+        "scale": 1.35,
+        "damageType": "blood",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "lifesteal",
+            "ratio": 0.25
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Vampire",
+      "ability": {
+        "id": "blood_siphon",
+        "name": "Blood Siphon",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 30,
+        "cooldown": 2,
+        "description": "Blood Siphon — Deals 150% INT Blood DMG with 30% Lifesteal.",
+        "stat": "INT",
+        "scale": 1.5,
+        "damageType": "blood",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "lifesteal",
+            "ratio": 0.3
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Potions Professor",
+      "ability": {
+        "id": "moonlight_shield",
+        "name": "Moonlight Shield",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 3,
+        "description": "Moonlight Shield — Constructs crimson shield absorbing 20% Max HP damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.2,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Scarlet Scholar",
+      "ability": {
+        "id": "vampire_transformation",
+        "name": "Vampire Transformation",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Vampire Transformation — +15% Speed, +20% Lifesteal on all strikes for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "lifesteal",
+            "ratio": 0.2
+          },
+          {
+            "type": "buff",
+            "stat": "speed",
+            "amount": 0.15,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Shaman King",
+      "ability": {
+        "id": "scarlet_blood_domain",
+        "name": "Scarlet Blood Domain",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Scarlet Blood Domain — Crimson moonlight zone dealing 160% INT Blood DMG to all enemies and siphoning SP (+15 SP per enemy).",
+        "stat": "INT",
+        "scale": 1.6,
+        "damageType": "crimson",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "High Summoner",
+      "ability": {
+        "id": "lunar_blessing",
+        "name": "Lunar Blessing",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 4,
+        "description": "Lunar Blessing — Heals 25% Max HP and grants +20% INT for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.25,
+            "scaling": "INT",
+            "multiplier": 0
+          },
+          {
+            "type": "buff",
+            "amount": 0.2,
+            "stat": "int",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Life-Giver",
+      "ability": {
+        "id": "crimson_moon_curse",
+        "name": "Crimson Moon Curse",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Crimson Moon Curse — Deals 260% INT Blood DMG and lowers target Speed and Accuracy by 20%.",
+        "stat": "INT",
+        "scale": 2.6,
+        "damageType": "crimson",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.2,
+            "stat": "speed",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Beauty Goddess",
+      "ability": {
+        "id": "full_moon_cataclysm",
+        "name": "Full Moon Cataclysm",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Full Moon Cataclysm — Calls full moon storm dealing 320% INT Crimson DMG.",
+        "stat": "INT",
+        "scale": 3.2,
+        "damageType": "crimson",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Moon",
+      "ability": {
+        "id": "goddess_of_crimson",
+        "name": "Goddess of Crimson",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Goddess of Crimson — Unleashes crimson moon authority dealing 400% INT True DMG.",
+        "stat": "INT",
+        "scale": 4.0,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

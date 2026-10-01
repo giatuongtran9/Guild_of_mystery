@@ -1,0 +1,278 @@
+{
+  "schema": "pathway.v1",
+  "key": "demoness",
+  "name": "Demoness",
+  "group": "Calamity of Destruction",
+  "archetype": "Agility",
+  "material": "Black Mirror",
+  "mythicalForm": "Purple Thread Serpent Spider",
+  "survival": [
+    "Mirror Substitution [Escape]",
+    "Temptation Healing [Heal]"
+  ],
+  "role": "Curse / Poison / Evasion",
+  "intro": "The Demoness pathway combines agility, curses, poison, charm and catastrophic feminine transformation. It excels at control and punishing prolonged fights.",
+  "meter": {
+    "name": "Corruption",
+    "key": "corruption",
+    "max": 100,
+    "gain": "Curses and prolonged combat",
+    "spend": "Plague, Catastrophe and Thralls",
+    "full": "Next curse triggers plague",
+    "special": "Corruption",
+    "characteristic": "Hybrid / Affliction",
+    "quirkName": "Pestilence Authority",
+    "quirkText": "Combat-only curses, charm, poison and survival."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Assassin",
+      "ability": {
+        "id": "killing_point",
+        "name": "Killing Point",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Killing Point — +12% Critical Chance and Poison Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "crit",
+            "amount": 0.12
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Instigator",
+      "ability": {
+        "id": "instigation",
+        "name": "Instigation",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 2,
+        "description": "Instigation — Deals 120% INT Psychic DMG and confuses target for 1 round.",
+        "stat": "INT",
+        "scale": 1.2,
+        "damageType": "psychic",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Witch",
+      "ability": {
+        "id": "witch_s_curse",
+        "name": "Witch's Curse",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 2,
+        "description": "Witch's Curse — Inflicts curse DoT (3% Max HP/turn) + 130% INT Poison DMG.",
+        "stat": "INT",
+        "scale": 1.3,
+        "damageType": "poison",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Pleasure",
+      "ability": {
+        "id": "affliction_thread",
+        "name": "Affliction Thread",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Affliction Thread — Binds target with invisible threads dealing 150% INT DMG and lowering Speed by 20%.",
+        "stat": "INT",
+        "scale": 1.5,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Escape",
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.2,
+            "stat": "speed",
+            "duration": 2
+          },
+          {
+            "type": "status",
+            "status": "bound",
+            "chance": 1,
+            "duration": 1
+          },
+          {
+            "type": "status",
+            "status": "untargetable",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Affliction",
+      "ability": {
+        "id": "mirror_substitution",
+        "name": "Mirror Substitution",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Mirror Substitution — Substitutes body with a mirror clone, shedding debuffs and evading next attack.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "cleanse"
+          },
+          {
+            "type": "status",
+            "status": "evade",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Despair",
+      "ability": {
+        "id": "unaging_mirror_clone",
+        "name": "Unaging Mirror Clone",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Unaging Mirror Clone — Substitutes body with a mirror clone, shedding all debuffs and freezing attacker for 1 round (160% INT Frost DMG).",
+        "stat": "INT",
+        "scale": 1.6,
+        "damageType": "frost",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "stunned",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Unshadowed Demoness",
+      "ability": {
+        "id": "despair_thread",
+        "name": "Despair Thread",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 4,
+        "description": "Despair Thread — Deals 230% INT Black Flame DMG and silences active skills for 1 round.",
+        "stat": "INT",
+        "scale": 2.3,
+        "damageType": "elemental",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "silenced",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Catastrophe",
+      "ability": {
+        "id": "pestilence_realm",
+        "name": "Pestilence Realm",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Pestilence Realm — Spreads pestilence dealing 280% INT Poison DMG to all enemies.",
+        "stat": "INT",
+        "scale": 2.8,
+        "damageType": "poison",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Apocalypse",
+      "ability": {
+        "id": "world_epidemic",
+        "name": "World Epidemic",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "World Epidemic — Deals 330% INT Pestilence DMG; executes targets below 15% HP.",
+        "stat": "INT",
+        "scale": 3.3,
+        "damageType": "elemental",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "execute",
+            "threshold": 0.15,
+            "multiplier": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Demoness",
+      "ability": {
+        "id": "abyss_of_despair",
+        "name": "Abyss of Despair",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Abyss of Despair — Unleashes primordial despair dealing 400% INT True DMG.",
+        "stat": "INT",
+        "scale": 4.0,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

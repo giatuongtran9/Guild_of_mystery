@@ -1,0 +1,274 @@
+{
+  "schema": "pathway.v1",
+  "key": "black_emperor",
+  "name": "Black Emperor",
+  "group": "The Anarchy",
+  "archetype": "Agility",
+  "material": "Corrupted Coin",
+  "mythicalForm": "Crown Brass Sovereign Titan",
+  "survival": [
+    "Barbaric Physique [Defense]",
+    "Shadow Re-establishment [Heal]"
+  ],
+  "role": "Distortion / Abolition / Theft",
+  "intro": "The Black Emperor pathway bends rules, order and authority. Its users thrive by disrupting established structures and imposing their own distorted laws.",
+  "meter": {
+    "name": "Authority",
+    "key": "authority",
+    "max": 100,
+    "gain": "Exploiting rules and loopholes",
+    "spend": "Bribery and distortion",
+    "full": "Next distortion is empowered",
+    "special": "Disorder",
+    "characteristic": "Body / Concept",
+    "quirkName": "Disorder Authority",
+    "quirkText": "Combat-only distortion, shields and rule abolition."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Lawyer",
+      "ability": {
+        "id": "exploit_loophole",
+        "name": "Exploit Loophole",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 2,
+        "description": "Exploit Loophole — Exploits combat loophole: steals 10% DEF from enemy for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "steal_stat",
+            "stat": "def",
+            "amount": 0.1,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Barbarian",
+      "ability": {
+        "id": "barbaric_physique",
+        "name": "Barbaric Physique",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Barbaric Physique — +12% Max HP, +10% Physical DEF armor.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "def",
+            "amount": 0.1
+          },
+          {
+            "type": "stat_modifier",
+            "stat": "hp",
+            "amount": 0.12
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Briber",
+      "ability": {
+        "id": "bribe_weakening",
+        "name": "Bribe Weakening",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 2,
+        "description": "Bribe Weakening — Bribes law: lowers target ATK by 20% for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.2,
+            "stat": "atk",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Baron of Corruption",
+      "ability": {
+        "id": "distort_impact",
+        "name": "Distort Impact",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Distort Impact — Distorts strike vector, reducing incoming attack damage by 40%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "damage_taken",
+            "amount": -0.4,
+            "duration": "next_turn"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Mentor of Disorder",
+      "ability": {
+        "id": "order_distortion",
+        "name": "Order Distortion",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Order Distortion — Distorts rules, forcing enemy to miss next strike and take 150% ATK DMG.",
+        "stat": "ATK",
+        "scale": 1.5,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "next_attack_miss",
+            "chance": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Earl of the Fallen",
+      "ability": {
+        "id": "magnify_disorder",
+        "name": "Magnify Disorder",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Magnify Disorder — Magnifies battlefield errors (180% ATK Disorder DMG) and forces enemy active skills onto cooldown.",
+        "stat": "ATK",
+        "scale": 1.8,
+        "damageType": "disorder",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "cooldown_increase",
+            "amount": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Frenzied High Priest",
+      "ability": {
+        "id": "chaos_field",
+        "name": "Chaos Field",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 65,
+        "cooldown": 4,
+        "description": "Chaos Field — Creates disorder zone causing 30% enemy skill misfire chance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "skill_misfire",
+            "chance": 0.3
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Duke of Entropy",
+      "ability": {
+        "id": "entropy_crush",
+        "name": "Entropy Crush",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Entropy Crush — Deals 270% ATK Physical/Disorder DMG.",
+        "stat": "ATK",
+        "scale": 2.7,
+        "damageType": "disorder",
+        "formula": "empowered_hybrid_agility",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Prince of Abolition",
+      "ability": {
+        "id": "abolish_rules",
+        "name": "Abolish Rules",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Abolish Rules — Abolishes enemy status shields and deals 320% ATK DMG.",
+        "stat": "ATK",
+        "scale": 3.2,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "strip_buffs"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Black Emperor",
+      "ability": {
+        "id": "shadow_re_establishment",
+        "name": "Shadow Re-establishment",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 125,
+        "cooldown": 5,
+        "description": "Shadow Re-establishment — Re-establishes imperial rule dealing 420% ATK True DMG.",
+        "stat": "ATK",
+        "scale": 4.2,
+        "damageType": "true",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

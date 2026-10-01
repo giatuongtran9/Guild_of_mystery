@@ -1,0 +1,293 @@
+{
+  "schema": "pathway.v1",
+  "key": "red_priest",
+  "name": "Red Priest",
+  "group": "Calamity of Destruction",
+  "archetype": "Agility",
+  "material": "War Ash",
+  "mythicalForm": "War Flame Chimera Dragon",
+  "survival": [
+    "Hunter's Instinct [Defense]",
+    "Blood Consumption [Heal]"
+  ],
+  "role": "War / Fire / AoE",
+  "intro": "The Red Priest pathway specializes in war, fire, provocation and large-scale destruction. It grows stronger as battle becomes more chaotic and dangerous.",
+  "meter": {
+    "name": "War Momentum",
+    "key": "warMomentum",
+    "max": 100,
+    "gain": "Dealing/suffering damage and team combat",
+    "spend": "Fire, Cull, Weather and Conquest",
+    "full": "Next offensive ability gains AoE",
+    "special": "War Momentum",
+    "characteristic": "Body / War",
+    "quirkName": "War Authority",
+    "quirkText": "Combat-only battlefield aggression and burn."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Hunter",
+      "ability": {
+        "id": "hunter_s_instinct",
+        "name": "Hunter's Instinct",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Hunter's Instinct — +10% Hit Chance, +10% Speed, Fire Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "initiative",
+            "amount": 10.0
+          },
+          {
+            "type": "hitChance",
+            "amount": 0.1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Provoker",
+      "ability": {
+        "id": "provocation",
+        "name": "Provocation",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 2,
+        "description": "Provocation — Taunts enemy, lowering target DEF by 20% for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "stat": "def",
+            "amount": 0.2,
+            "duration": 2
+          },
+          {
+            "type": "taunt",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Pyromaniac",
+      "ability": {
+        "id": "fireball_barrage",
+        "name": "Fireball Barrage",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 1,
+        "description": "Fireball Barrage — Deals 140% ATK + 0.35 INT Fire DMG.",
+        "stat": "ATK",
+        "scale": 1.4,
+        "damageType": "fire",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_component",
+            "stat": "INT",
+            "multiplier": 0.35
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Conspirer",
+      "ability": {
+        "id": "reaper_s_harvest",
+        "name": "Reaper's Harvest",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Reaper's Harvest — Deals 170% ATK Physical DMG with +25% Critical DMG bonus.",
+        "stat": "ATK",
+        "scale": 1.7,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "crit",
+            "amount": 0.25
+          },
+          {
+            "type": "critDamage",
+            "amount": 0.25
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Reaper",
+      "ability": {
+        "id": "iron_blood_vigor",
+        "name": "Iron Blood Vigor",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Iron Blood Vigor — +15% Max HP, +15% DEF armor.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "def",
+            "amount": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Iron-blooded Knight",
+      "ability": {
+        "id": "iron_blood_steel_body",
+        "name": "Iron Blood Steel Body",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Iron Blood Steel Body — Hardens body into war steel; grants +30% Physical DEF and empowers next melee strike with +180% War Flame DMG.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "def",
+            "amount": 0.3
+          },
+          {
+            "type": "next_damage_bonus",
+            "amount": 1.8
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "War Bishop",
+      "ability": {
+        "id": "war_command",
+        "name": "War Command",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 65,
+        "cooldown": 3,
+        "description": "War Command — Boosts user ATK and Speed by 25% for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "buff",
+            "stat": "atk",
+            "amount": 0.25,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Weather Warlock",
+      "ability": {
+        "id": "weather_storm",
+        "name": "Weather Storm",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Weather Storm — Calls down fire and wind storm dealing 270% ATK Fire DMG.",
+        "stat": "ATK",
+        "scale": 2.7,
+        "damageType": "fire",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Conqueror",
+      "ability": {
+        "id": "conqueror_s_march",
+        "name": "Conqueror's March",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Conqueror's March — Deals 320% ATK Fire DMG and stuns target for 1 round.",
+        "stat": "ATK",
+        "scale": 3.2,
+        "damageType": "fire",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "stunned",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Red Priest",
+      "ability": {
+        "id": "war_flame_cataclysm",
+        "name": "War Flame Cataclysm",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 125,
+        "cooldown": 5,
+        "description": "War Flame Cataclysm — Unleashes apocalyptic war flames dealing 420% ATK Fire True DMG.",
+        "stat": "ATK",
+        "scale": 4.2,
+        "damageType": "true",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

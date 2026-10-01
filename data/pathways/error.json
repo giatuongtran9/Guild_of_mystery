@@ -1,0 +1,320 @@
+{
+  "schema": "pathway.v1",
+  "key": "error",
+  "name": "Error",
+  "group": "Lord of Mysteries",
+  "archetype": "Agility",
+  "material": "Corrupted Coin",
+  "mythicalForm": "Clock-faced Worms of Time",
+  "survival": [
+    "Parasitic Drain [Heal]",
+    "Deceive Impact [Escape]"
+  ],
+  "role": "Theft / Distortion / Time",
+  "intro": "The Error pathway exploits loopholes, theft, deception and the flaws in supernatural rules. Its strength grows through misdirection, parasitism and abnormal interference.",
+  "meter": {
+    "name": "Theft",
+    "key": "theft",
+    "max": 100,
+    "gain": "Stealing and deception",
+    "spend": "Theft and parasitism",
+    "full": "Next theft is empowered",
+    "special": "Glitch",
+    "characteristic": "Spirit / Theft",
+    "quirkName": "Error Authority",
+    "quirkText": "Combat-only theft and turn manipulation."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Marauder",
+      "ability": {
+        "id": "combat_theft",
+        "name": "Combat Theft",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 2,
+        "description": "Combat Theft — Steals 10% ATK and 10% DEF from enemy for 2 rounds.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "steal_stat",
+            "stat": "atk",
+            "amount": 0.1,
+            "duration": 2
+          },
+          {
+            "type": "steal_stat",
+            "stat": "def",
+            "amount": 0.1,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Swindler",
+      "ability": {
+        "id": "deceptive_feint",
+        "name": "Deceptive Feint",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 20,
+        "cooldown": 2,
+        "description": "Deceptive Feint — Distorts enemy focus, dealing 110% ATK DMG + 100% Miss Chance on target's next hit.",
+        "stat": "ATK",
+        "scale": 1.1,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "next_attack_miss",
+            "chance": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Cryptologist",
+      "ability": {
+        "id": "flaw_exploitation",
+        "name": "Flaw Exploitation",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Flaw Exploitation — Attacks bypass 20% of target DEF by analyzing structural weaknesses.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "defPen",
+            "amount": 0.2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Baron of Rust",
+      "ability": {
+        "id": "rust_siphon",
+        "name": "Rust Siphon",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Rust Siphon — Corrodes armor dealing 140% INT Corrosion DMG and stealing 20% enemy ATK for 2 rounds.",
+        "stat": "INT",
+        "scale": 1.4,
+        "damageType": "corrosion",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "steal_stat",
+            "stat": "atk",
+            "amount": 0.2,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Mentor of Confusion",
+      "ability": {
+        "id": "logic_distortion",
+        "name": "Logic Distortion",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Logic Distortion — Forces target enemy to cast their primary skill on their own team for 150% DMG.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "mind_control",
+            "damageMultiplier": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Parasite",
+      "ability": {
+        "id": "parasitic_contagion",
+        "name": "Parasitic Contagion",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Parasitic Contagion — Parasitizes target, draining 20 SP/turn for 2 rounds while restoring 10% Max HP to user.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.1
+          },
+          {
+            "type": "sp_drain",
+            "amount": 20.0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Mentor of Deceit",
+      "ability": {
+        "id": "deceive_impact",
+        "name": "Deceive Impact",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 4,
+        "description": "Deceive Impact -- Deceives damage rules: until your next turn, negates all incoming damage and reflects 100% of it back to the attacker.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "reflect",
+            "mode": "share",
+            "share": 1.0,
+            "negate": true,
+            "duration": "next_turn"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Trojan Horse of Destiny",
+      "ability": {
+        "id": "steal_destiny_turn",
+        "name": "Steal Destiny & Turn",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Steal Destiny & Turn — Steals all positive buffs and turn priority from enemy, gaining immediate turn +25% stats.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "strip_buffs"
+          },
+          {
+            "type": "buff",
+            "stat": "atk",
+            "amount": 0.25,
+            "duration": 2
+          },
+          {
+            "type": "buff",
+            "stat": "int",
+            "amount": 0.25,
+            "duration": 2
+          },
+          {
+            "type": "extra_turn",
+            "amount": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Worm of Time",
+      "ability": {
+        "id": "time_theft",
+        "name": "Time Theft",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Time Theft — Steals 1 turn from target enemy (skipping their turn) and grants an extra turn to user.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "stunned",
+            "duration": 1
+          },
+          {
+            "type": "extra_turn",
+            "amount": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "The Error",
+      "ability": {
+        "id": "systemic_glitch",
+        "name": "Systemic Glitch",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Systemic Glitch — Steals 30% HP, 30% ATK, and all buffs from target, dealing 420% INT True DMG.",
+        "stat": "INT",
+        "scale": 4.2,
+        "damageType": "true",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          },
+          {
+            "type": "steal_stat",
+            "stat": "hp",
+            "amount": 0.3
+          },
+          {
+            "type": "steal_stat",
+            "stat": "atk",
+            "amount": 0.3,
+            "duration": 2
+          },
+          {
+            "type": "strip_buffs"
+          }
+        ]
+      }
+    }
+  ]
+}

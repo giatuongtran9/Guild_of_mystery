@@ -1,0 +1,271 @@
+{
+  "schema": "pathway.v1",
+  "key": "abyss",
+  "name": "Abyss",
+  "group": "Devil & Chained",
+  "archetype": "Agility",
+  "material": "Brimstone Shard",
+  "mythicalForm": "Horned Hellfire Archdemon",
+  "survival": [
+    "Devil's Skin [Defense]",
+    "Corrupted Flesh [Heal]"
+  ],
+  "role": "Agility",
+  "intro": "The Abyss pathway embodies desire, corruption, brutality and demonic power. Its abilities are aggressive and often become stronger through debuffs and suffering.",
+  "meter": {
+    "name": "Desire",
+    "key": "desire",
+    "max": 100,
+    "gain": "Combat actions",
+    "spend": "Pathway abilities",
+    "full": "Next ability is empowered",
+    "special": "Desire",
+    "characteristic": "Agility",
+    "quirkName": "Horned Hellfire Archdemon",
+    "quirkText": "Survival: Devil's Skin [Defense], Corrupted Flesh [Heal]"
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Criminal",
+      "ability": {
+        "id": "brutal_strike",
+        "name": "Brutal Strike",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Brutal Strike — Deals 140% ATK Physical DMG; ignores 15% DEF.",
+        "stat": "ATK",
+        "scale": 1.4,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "defense_penetration",
+            "amount": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Unwinged Angel",
+      "ability": {
+        "id": "desire_ignition",
+        "name": "Desire Ignition",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 20,
+        "cooldown": 2,
+        "description": "Desire Ignition — Ignites enemy desire, dealing 120% ATK Fire DMG and increasing target skill SP cost by +30%.",
+        "stat": "ATK",
+        "scale": 1.2,
+        "damageType": "fire",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "sp_cost_increase",
+            "amount": 0.3,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Serial Killer",
+      "ability": {
+        "id": "devil_s_skin",
+        "name": "Devil's Skin",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Devil's Skin — +15% Physical DEF and Fire Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "def",
+            "amount": 0.15
+          },
+          {
+            "type": "resistance",
+            "values": {
+              "physical": 0.15,
+              "fire": 0.15
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Devil",
+      "ability": {
+        "id": "magma_arrow",
+        "name": "Magma Arrow",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Magma Arrow — Fires magma projectile dealing 160% ATK Fire/Magma DMG.",
+        "stat": "ATK",
+        "scale": 1.6,
+        "damageType": "magma",
+        "formula": "empowered_hybrid_agility",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Desire Apostle",
+      "ability": {
+        "id": "corrupted_flesh",
+        "name": "Corrupted Flesh",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Corrupted Flesh — Consumes corrupted flesh to restore 15% Max HP.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.15,
+            "scaling": "INT",
+            "multiplier": 0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Demon",
+      "ability": {
+        "id": "desire_ignition_burst",
+        "name": "Desire Ignition Burst",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Desire Ignition Burst — Ignites target inner desires (180% ATK Magma DMG); target skills cost +50% extra SP for 2 rounds.",
+        "stat": "ATK",
+        "scale": 1.8,
+        "damageType": "magma",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "sp_cost_increase",
+            "amount": 0.5,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Blatherer",
+      "ability": {
+        "id": "devil_mutation",
+        "name": "Devil Mutation",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 65,
+        "cooldown": 4,
+        "description": "Devil Mutation — Transforms into archdemon (+25% ATK, +20% DEF armor for 2 rounds).",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "buff",
+            "amount": 0.25,
+            "stat": "atk",
+            "duration": 2
+          },
+          {
+            "type": "buff",
+            "amount": 0.2,
+            "stat": "def",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Bloody Archduke",
+      "ability": {
+        "id": "foul_corruption",
+        "name": "Foul Corruption",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Foul Corruption — Spreads hellfire corruption dealing 270% ATK Magma DMG.",
+        "stat": "ATK",
+        "scale": 2.7,
+        "damageType": "magma",
+        "formula": "empowered_hybrid_agility",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Filthy Monarch",
+      "ability": {
+        "id": "abyssal_emperor",
+        "name": "Abyssal Emperor",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Abyssal Emperor — Unleashes hellfire blast dealing 330% ATK Magma DMG.",
+        "stat": "ATK",
+        "scale": 3.3,
+        "damageType": "magma",
+        "formula": "empowered_hybrid_agility",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Abyss",
+      "ability": {
+        "id": "monarch_of_magma",
+        "name": "Monarch of Magma",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 125,
+        "cooldown": 5,
+        "description": "Monarch of Magma — Summons abyssal hellfire dealing 420% ATK Magma True DMG.",
+        "stat": "ATK",
+        "scale": 4.2,
+        "damageType": "true",
+        "formula": "empowered_hybrid_agility",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

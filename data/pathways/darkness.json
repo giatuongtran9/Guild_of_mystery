@@ -1,0 +1,309 @@
+{
+  "schema": "pathway.v1",
+  "key": "darkness",
+  "name": "Darkness",
+  "group": "Eternal Darkness",
+  "archetype": "Agility",
+  "material": "Night Essence",
+  "mythicalForm": "Nine-Legged Night Spider",
+  "survival": [
+    "Nocturnal Vigor [Defense]",
+    "Peaceful Rest [Heal]"
+  ],
+  "role": "Sleep / Concealment / Survivability",
+  "intro": "The Darkness pathway governs sleep, concealment, nightmares and deathly quiet. Its users specialize in control, stealth and weakening enemies through supernatural darkness.",
+  "meter": {
+    "name": "Night",
+    "key": "night",
+    "max": 100,
+    "gain": "Fighting in darkness and sleep effects",
+    "spend": "Night and concealment",
+    "full": "Next night effect is empowered",
+    "special": "Night",
+    "characteristic": "Spirit / Darkness",
+    "quirkName": "Night Authority",
+    "quirkText": "Combat-only sleep, concealment and survival."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Sleepless",
+      "ability": {
+        "id": "nocturnal_vigor",
+        "name": "Nocturnal Vigor",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Nocturnal Vigor — +10% Speed, Sleep Immunity, and Fear Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "immunity",
+            "status": "sleep"
+          },
+          {
+            "type": "initiative",
+            "amount": 10.0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Midnight Poet",
+      "ability": {
+        "id": "midnight_requiem",
+        "name": "Midnight Requiem",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 20,
+        "cooldown": 3,
+        "description": "Midnight Requiem — Deals 120% INT Psychic DMG and inflicts 1-round forced Sleep status.",
+        "stat": "INT",
+        "scale": 1.2,
+        "damageType": "psychic",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "sleep",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Nightmare",
+      "ability": {
+        "id": "peaceful_rest",
+        "name": "Peaceful Rest",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 3,
+        "description": "Peaceful Rest — Cleanses mind and restores 12% Max HP.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "heal",
+            "maxHpRatio": 0.12,
+            "scaling": "INT",
+            "multiplier": 0
+          },
+          {
+            "type": "cleanse",
+            "duration": 0
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Soul Assurer",
+      "ability": {
+        "id": "dream_slumber",
+        "name": "Dream Slumber",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 3,
+        "description": "Dream Slumber — Puts enemy to sleep for 1 round or lowers target Speed by 30%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.3,
+            "stat": "speed",
+            "duration": 2
+          },
+          {
+            "type": "status",
+            "status": "sleep",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Spirit Warlock",
+      "ability": {
+        "id": "soul_pacification",
+        "name": "Soul Pacification",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Soul Pacification — Pacifies target soul, silencing active skills for 1 round.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "silenced",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Night Knight",
+      "ability": {
+        "id": "horror_domain",
+        "name": "Horror Domain",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Horror Domain — Nightmare terror wave dealing 170% INT Psychic DMG with a 40% chance to inflict Fear/Stun.",
+        "stat": "INT",
+        "scale": 1.7,
+        "damageType": "psychic",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
+          {
+            "type": "status_chance",
+            "status": "stunned",
+            "chance": 0.4,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Horror Bishop",
+      "ability": {
+        "id": "concealment_realm",
+        "name": "Concealment Realm",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 4,
+        "description": "Concealment Realm — Conceals user in darkness, gaining untargetability for 1 round.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "untargetable",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Evernight Servant",
+      "ability": {
+        "id": "serenity_realm",
+        "name": "Serenity Realm",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Serenity Realm — Forces enemy into Sleep state for 1 round + 240% INT Psychic DMG.",
+        "stat": "INT",
+        "scale": 2.4,
+        "damageType": "psychic",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "sleep",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Knight of Misfortune",
+      "ability": {
+        "id": "eternal_rest",
+        "name": "Eternal Rest",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Eternal Rest — Deals 310% INT Psychic DMG; executes targets below 15% HP.",
+        "stat": "INT",
+        "scale": 3.1,
+        "damageType": "psychic",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "execute",
+            "threshold": 0.15,
+            "multiplier": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Darkness",
+      "ability": {
+        "id": "horror_concealment",
+        "name": "Horror & Concealment",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Horror & Concealment — Eternally conceals enemies dealing 390% INT True Psychic DMG.",
+        "stat": "INT",
+        "scale": 3.9,
+        "damageType": "psychic",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          },
+          {
+            "type": "damage_rule",
+            "rule": "psychic_true"
+          }
+        ]
+      }
+    }
+  ]
+}

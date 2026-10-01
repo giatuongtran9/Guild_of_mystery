@@ -1,0 +1,350 @@
+{
+  "FIRST": [
+    "Kael",
+    "Mira",
+    "Dorian",
+    "Vess",
+    "Ilya",
+    "Rook",
+    "Sable",
+    "Neriah",
+    "Corvin",
+    "Ysolde",
+    "Halden",
+    "Ambrose",
+    "Nessa",
+    "Talia",
+    "Orin",
+    "Bracken",
+    "Lucen",
+    "Sorrel",
+    "Vaine",
+    "Perrin",
+    "Ottilie",
+    "Garran",
+    "Sylas",
+    "Fenna",
+    "Marek",
+    "Isolde",
+    "Cassian",
+    "Wren",
+    "Thale",
+    "Ruen"
+  ],
+  "LAST": [
+    "Ashgrove",
+    "Vell",
+    "Marrow",
+    "Drayce",
+    "Holloway",
+    "Quill",
+    "Stade",
+    "Ferrow",
+    "Bramlin",
+    "Gant",
+    "Crowe",
+    "Vantage",
+    "Sable",
+    "Lorn",
+    "Kestrel",
+    "Underwood",
+    "Byrne",
+    "Ainsley",
+    "Cobb",
+    "Rimm"
+  ],
+  "TRAITS": {
+    "Ironclad": {
+      "def_mult": 1.12,
+      "spd_mult": 0.95,
+      "desc": "+12% DEF, -5% Speed"
+    },
+    "Glass Cannon": {
+      "atk_mult": 1.15,
+      "hp_mult": 0.9,
+      "desc": "+15% ATK, -10% HP"
+    },
+    "Stout Vitality": {
+      "hp_mult": 1.15,
+      "atk_mult": 0.95,
+      "desc": "+15% HP, -5% ATK"
+    },
+    "Fervent Spirit": {
+      "int_mult": 1.15,
+      "def_mult": 0.9,
+      "sp_mult": 1.1,
+      "desc": "+15% INT, +10% Max SP, -10% DEF"
+    },
+    "Stoic Mind": {
+      "def_mult": 1.1,
+      "resistance": 0.25,
+      "desc": "+10% DEF, +25% Mental Pollution/Madness resistance"
+    },
+    "Swiftfoot": {
+      "spd_mult": 1.12,
+      "def_mult": 0.95,
+      "desc": "+12% Speed, -5% DEF"
+    },
+    "Bloodthirst": {
+      "atk_mult": 1.08,
+      "def_mult": 0.95,
+      "desc": "+8% ATK, -5% DEF, recover 8% of damage dealt as HP",
+      "lifesteal": 0.08
+    },
+    "Madness Prone": {
+      "int_mult": 0.85,
+      "resistance": 0.15,
+      "atk_mult": 1.1,
+      "desc": "-15% INT, +15% INT resistance, +10% ATK"
+    }
+  },
+  "TRAIT_NAMES": [
+    "Ironclad",
+    "Glass Cannon",
+    "Stout Vitality",
+    "Fervent Spirit",
+    "Stoic Mind",
+    "Swiftfoot",
+    "Bloodthirst",
+    "Madness Prone"
+  ],
+  "OCCUPATIONS": [
+    "Clerk",
+    "Dockworker",
+    "Teacher",
+    "Shopkeeper",
+    "Messenger",
+    "Watchman",
+    "Tailor",
+    "Printer",
+    "Mechanic",
+    "Bookkeeper",
+    "Apothecary Assistant",
+    "Journalist"
+  ],
+  "enemy_names": [
+    "Masked Cultist",
+    "Red Glove Adept",
+    "Undead Bailiff",
+    "Dream Eater",
+    "Storm Beast",
+    "Mirror Witch",
+    "Forbidden Scholar",
+    "Pale Hunter"
+  ],
+  "human_enemy_names": {
+    "first": [
+      "Kael",
+      "Mira",
+      "Dorian",
+      "Vess",
+      "Ilya",
+      "Rook",
+      "Sable",
+      "Neriah",
+      "Corvin",
+      "Ysolde",
+      "Halden",
+      "Ambrose",
+      "Nessa",
+      "Talia",
+      "Orin",
+      "Bracken",
+      "Lucen",
+      "Sorrel",
+      "Vaine",
+      "Perrin",
+      "Ottilie",
+      "Garran",
+      "Sylas",
+      "Fenna",
+      "Marek",
+      "Isolde",
+      "Cassian",
+      "Wren",
+      "Thale",
+      "Ruen"
+    ],
+    "last": [
+      "Ashgrove",
+      "Vell",
+      "Marrow",
+      "Drayce",
+      "Holloway",
+      "Quill",
+      "Stade",
+      "Ferrow",
+      "Bramlin",
+      "Gant",
+      "Crowe",
+      "Vantage",
+      "Sable",
+      "Lorn",
+      "Kestrel",
+      "Underwood",
+      "Byrne",
+      "Ainsley",
+      "Cobb",
+      "Rimm"
+    ]
+  },
+  "human_enemy_occupations": [
+    "Clerk",
+    "Dockworker",
+    "Teacher",
+    "Shopkeeper",
+    "Messenger",
+    "Watchman",
+    "Tailor",
+    "Printer",
+    "Mechanic",
+    "Bookkeeper",
+    "Apothecary Assistant",
+    "Journalist"
+  ],
+  "human_enemy_weapons": {
+    "none": {
+      "id": "none",
+      "name": "Bare Hands",
+      "atk": 0,
+      "range": 1,
+      "kind": "unarmed",
+      "crit": 0,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0,
+      "text": "Normal close combat with bare hands."
+    },
+    "revolver": {
+      "id": "revolver",
+      "name": "Service Revolver",
+      "atk": 30,
+      "range": 18,
+      "kind": "gun",
+      "crit": 0.02,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0,
+      "text": "Powerful Victorian sidearm. Gun Mastery determines accuracy."
+    },
+    "pistol": {
+      "id": "pistol",
+      "name": "Pocket Pistol",
+      "atk": 26,
+      "range": 12,
+      "kind": "gun",
+      "crit": 0.01,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0,
+      "text": "Compact pistol with high damage but no innate accuracy bonus."
+    },
+    "sword": {
+      "id": "sword",
+      "name": "Service Sword",
+      "atk": 12,
+      "range": 2,
+      "kind": "weapon",
+      "crit": 0.03,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0.08,
+      "text": "Reliable sword. Weapon Mastery increases normal damage."
+    },
+    "knife": {
+      "id": "knife",
+      "name": "Fighting Knife",
+      "atk": 8,
+      "range": 1,
+      "kind": "weapon",
+      "crit": 0.04,
+      "dodge": 0,
+      "miss": 0,
+      "bleed": 0.18,
+      "text": "Knife: +8 ATK and 18% chance to cause Bleed."
+    },
+    "club": {
+      "id": "club",
+      "name": "Heavy Club",
+      "atk": 10,
+      "range": 1,
+      "kind": "weapon",
+      "crit": 0.01,
+      "dodge": 0,
+      "miss": 0.04,
+      "bleed": 0,
+      "text": "Heavy blunt weapon with reliable impact."
+    }
+  },
+  "threat_tables": {
+    "named_targets": [
+      {
+        "target": "Elias Vane",
+        "path": "Unknown",
+        "threat": "★★★★☆",
+        "lastSeen": "South Wharf",
+        "story": "Three merchants have disappeared over the past two weeks. Their bodies were eventually discovered along the old canal, each bearing a single red cut across the throat. Witnesses describe a man wearing a dark travelling coat who asks merchants about their family before following them. The authorities believe Elias Vane is responsible for at least six murders. Yesterday, a dockworker survived an encounter with him and reported seeing supernatural abilities. The guild has been offered a substantial reward for his capture.",
+        "rewardFunds": 1250,
+        "rewardRep": 18,
+        "rewardMaterials": 3
+      },
+      {
+        "target": "Mara Quill",
+        "path": "Demoness",
+        "threat": "★★★★★",
+        "lastSeen": "Old Market",
+        "story": "Several disappearances have been linked to a woman who leaves black mirrors at the scene. Survivors report charms, poison and impossible reflections. The guild is asked to bring her in before another district is affected.",
+        "rewardFunds": 1600,
+        "rewardRep": 22,
+        "rewardMaterials": 3
+      },
+      {
+        "target": "Jonas Rook",
+        "path": "Error",
+        "threat": "★★★★☆",
+        "lastSeen": "Clockmaker’s Row",
+        "story": "A string of impossible thefts has left locked rooms empty without signs of entry. Witnesses describe a man who seems to make attacks and doors behave incorrectly. The authorities suspect supernatural interference.",
+        "rewardFunds": 1450,
+        "rewardRep": 20,
+        "rewardMaterials": 3
+      }
+    ],
+    "contracts": [
+      [
+        "A Missing Cat",
+        "Mrs. Eliza Bell, a seamstress in Whitechapel, arrives at the guild office in tears. Her black cat, Morrow, vanished before dawn. She cannot afford a private detective and asks the guild to search the alleys, courtyards and coal sheds nearby. The cat is frightened, not dangerous; this is a search and rescue contract.",
+        "normal"
+      ],
+      [
+        "The Stolen Heirloom",
+        "A respectable family claims a silver locket was stolen from a locked room. The owner suspects a servant, but the room shows signs of something stranger.",
+        "normal"
+      ],
+      [
+        "Murder at Bell House",
+        "A local constable asks the guild to discreetly investigate a murder before panic spreads. The victim's final note mentions a person who should not have been there.",
+        "mystery"
+      ],
+      [
+        "The Whispering Tenant",
+        "Residents of a boarding house report knocking from an empty room every midnight. The landlord wants the matter solved quietly.",
+        "mystery"
+      ],
+      [
+        "A Vanished Watchman",
+        "A night watchman disappeared while patrolling a quiet street. His lantern was found still burning beside a locked iron gate.",
+        "mystery"
+      ],
+      [
+        "The Chapel Below",
+        "A charitable chapel reports strange chanting beneath its foundations. The priest insists there is no basement, yet a staircase was discovered after midnight.",
+        "occult"
+      ],
+      [
+        "The Red Ledger",
+        "Several merchants received identical anonymous invoices for goods they never ordered. Those who ignored them later disappeared.",
+        "occult"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,273 @@
+{
+  "schema": "pathway.v1",
+  "key": "paragon",
+  "name": "Paragon",
+  "group": "Knowledge & Wisdom",
+  "archetype": "Caster",
+  "material": "Brass Gear",
+  "mythicalForm": "Mechanical Engine Titan",
+  "survival": [
+    "Runic Shield [Defense]",
+    "Matter Fortification [Defense]"
+  ],
+  "role": "Caster",
+  "intro": "The Paragon pathway advances through science, artifacts, machinery and craftsmanship. Its users turn technical mastery into increasingly sophisticated supernatural tools.",
+  "meter": {
+    "name": "Invention",
+    "key": "invention",
+    "max": 100,
+    "gain": "Combat actions",
+    "spend": "Pathway abilities",
+    "full": "Next ability is empowered",
+    "special": "Invention",
+    "characteristic": "Caster",
+    "quirkName": "Mechanical Engine Titan",
+    "quirkText": "Survival: Runic Shield [Defense], Matter Fortification [Defense]"
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Savant",
+      "ability": {
+        "id": "mechanical_precision",
+        "name": "Mechanical Precision",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Mechanical Precision — +10% Hit Chance, Piercing & Corrosion Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "hitChance",
+            "amount": 0.1
+          },
+          {
+            "type": "resistance",
+            "values": {
+              "piercing": 0.1,
+              "corrosion": 0.1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Archaeologist",
+      "ability": {
+        "id": "crafted_blade",
+        "name": "Crafted Blade",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Crafted Blade — Deals 135% ATK Physical Piercing DMG.",
+        "stat": "ATK",
+        "scale": 1.35,
+        "damageType": "piercing",
+        "formula": "empowered_hybrid_physical",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Appraiser",
+      "ability": {
+        "id": "runic_shield",
+        "name": "Runic Shield",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 3,
+        "description": "Runic Shield — Constructs runic barrier absorbing 20% Max HP damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.2,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Artisan",
+      "ability": {
+        "id": "alchemical_fire",
+        "name": "Alchemical Fire",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Alchemical Fire — Fires alchemical flames dealing 160% INT Fire DMG.",
+        "stat": "INT",
+        "scale": 1.6,
+        "damageType": "fire",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Astronomer",
+      "ability": {
+        "id": "matter_fortification",
+        "name": "Matter Fortification",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Matter Fortification — +25% DEF armor, reduces incoming physical damage by 20%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "buff",
+            "amount": 0.25,
+            "stat": "def",
+            "duration": 2
+          },
+          {
+            "type": "damage_taken",
+            "amount": -0.2,
+            "duration": "next_turn"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Alchemist",
+      "ability": {
+        "id": "alchemical_overclock",
+        "name": "Alchemical Overclock",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Alchemical Overclock — Overclocks mechanical core, granting +25% Speed and boosting next Energy Cannon strike by +35% DMG.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "next_damage_bonus",
+            "amount": 0.35
+          },
+          {
+            "type": "buff",
+            "stat": "speed",
+            "amount": 0.25,
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Arcane Scholar",
+      "ability": {
+        "id": "energy_cannon",
+        "name": "Energy Cannon",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 70,
+        "cooldown": 3,
+        "description": "Energy Cannon — Fires Siege Energy Cannon dealing 240% INT DMG; bypasses 40% target DEF.",
+        "stat": "INT",
+        "scale": 2.4,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "defPen",
+            "amount": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Knowledge Magister",
+      "ability": {
+        "id": "divine_metallurgy",
+        "name": "Divine Metallurgy",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Divine Metallurgy — Constructs titan armor absorbing 30% Max HP damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.3,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Illuminator",
+      "ability": {
+        "id": "creation_engine",
+        "name": "Creation Engine",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Creation Engine — Fires heavy energy beam dealing 330% INT Physical/Magic DMG.",
+        "stat": "INT",
+        "scale": 3.3,
+        "damageType": "magic",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Paragon",
+      "ability": {
+        "id": "god_of_crafting",
+        "name": "God of Crafting",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "God of Crafting — Unleashes mechanical titan annihilation dealing 410% INT True DMG.",
+        "stat": "INT",
+        "scale": 4.1,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

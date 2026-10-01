@@ -1,0 +1,56 @@
+{
+  "version": "v16.0",
+  "damage_formulas": {
+    "basic_physical_attack": {
+      "formula": "round((ATK * ATK_mod + Weapon_Bonus_DMG) * Strike_Mult - Defender_DEF * 0.5)",
+      "description": "Standard melee/ranged weapon strikes. Pure ATK scaling with 0% INT dependence.",
+      "weapon_mastery_applies": true
+    },
+    "pure_caster_ability": {
+      "formula": "round((INT * Ability_Mult * INT_mod) * Pathway_Tuning * Seq_Mult - Defender_DEF * 0.5)",
+      "description": "Spiritual, elemental, and metaphysical magic spells funded by SP.",
+      "def_armor_penetration": "25% DEF bypass (Psychic True DMG bypasses 100% DEF)",
+      "weapon_mastery_applies": false
+    },
+    "empowered_hybrid_physical": {
+      "formula": "round(((ATK * ATK_mod * 1.05) + (INT * 0.30 * INT_mod)) * Ability_Mult - Defender_DEF * 0.5)",
+      "description": "Physical strikes imbued with spirituality (e.g. Sailor, Guardian, Reaper).",
+      "def_armor_penetration": "22% DEF bypass",
+      "weapon_mastery_applies": false
+    },
+    "empowered_hybrid_agility": {
+      "formula": "round(((ATK * ATK_mod * 0.85) + (INT * 0.55 * INT_mod)) * Ability_Mult - Defender_DEF * 0.5)",
+      "description": "Agile, high-speed strikes with spiritual finesse (e.g. Marauder, Nightwalker, Witch).",
+      "def_armor_penetration": "22% DEF bypass",
+      "weapon_mastery_applies": false
+    },
+    "def_armor_mitigation": {
+      "formula": "Defender_DEF * 0.5",
+      "description": "Physical armor and defensive stats subtract half of DEF value from non-penetrating damage."
+    }
+  },
+  "mythical_creature_form_rules": {
+    "activation_limit": "Once per battle",
+    "sp_cost": 50,
+    "unlocked_at_sequence": 4,
+    "stance_buffs": {
+      "hp_shield": "+30% Max HP Shield",
+      "damage_bonus": "+20% All Damage",
+      "mental_pollution_aura": "Forces INT checks on enemies every turn (20% chance for turn-skip/confusion)"
+    },
+    "casting_rule": "FULL ABILITY CASTING PERMITTED WHILE TRANSFORMED. Mythical Form acts as an active stance buff and does not disable skills."
+  },
+  "combat_pipeline": {
+    "version": "v17",
+    "basic_attack": "(ATK * offensive_mod + weapon_bonus) * strike_multiplier * authority_multiplier",
+    "ability_attack": "scaling_stat * ability_multiplier * offensive_mod * authority_multiplier",
+    "hybrid_attack": "((ATK * 1.05) + (INT * 0.30)) * ability_multiplier * authority_multiplier",
+    "mitigation": "raw_damage * (1 - resistance/100) - DEF * 0.5 * (1 - defense_penetration)",
+    "true_damage": "raw_damage",
+    "resistance_clamp": {
+      "min": -100,
+      "max": 90
+    },
+    "minimum_damage": 1
+  }
+}

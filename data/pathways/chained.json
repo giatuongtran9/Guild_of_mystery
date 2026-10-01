@@ -1,0 +1,293 @@
+{
+  "schema": "pathway.v1",
+  "key": "chained",
+  "name": "Chained",
+  "group": "Devil & Chained",
+  "archetype": "Physical",
+  "material": "Rusted Chain",
+  "mythicalForm": "Bound Shadow Abomination",
+  "survival": [
+    "Shackled Endurance [Defense]",
+    "Possession Phase [Escape]"
+  ],
+  "role": "Physical",
+  "intro": "The Chained pathway focuses on restraint, curses, mutation and control. Its supernatural strength comes from binding enemies and surviving through abnormal transformations.",
+  "meter": {
+    "name": "Restraint",
+    "key": "restraint",
+    "max": 100,
+    "gain": "Combat actions",
+    "spend": "Pathway abilities",
+    "full": "Next ability is empowered",
+    "special": "Restraint",
+    "characteristic": "Physical",
+    "quirkName": "Bound Shadow Abomination",
+    "quirkText": "Survival: Shackled Endurance [Defense], Possession Phase [Escape]"
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Prisoner",
+      "ability": {
+        "id": "shackled_endurance",
+        "name": "Shackled Endurance",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Shackled Endurance — +15% Physical DEF and Slashing Resistance.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "def",
+            "amount": 0.15
+          },
+          {
+            "type": "resistance",
+            "values": {
+              "physical": 0.15,
+              "slashing": 0.15
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Lunatic",
+      "ability": {
+        "id": "madness_curse",
+        "name": "Madness Curse",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 2,
+        "description": "Madness Curse — Deals 120% ATK Physical DMG and reduces target Speed by 15%.",
+        "stat": "ATK",
+        "scale": 1.2,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.15,
+            "stat": "speed",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Werewolf",
+      "ability": {
+        "id": "possession_phase",
+        "name": "Possession Phase",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 25,
+        "cooldown": 3,
+        "description": "Possession Phase — Grants 1 round untargetability to physical strikes.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Zombie",
+      "ability": {
+        "id": "spiteful_strike",
+        "name": "Spiteful Strike",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 35,
+        "cooldown": 2,
+        "description": "Spiteful Strike — Deals 160% ATK Slashing DMG with +20% extra damage if user HP is below 50%.",
+        "stat": "ATK",
+        "scale": 1.6,
+        "damageType": "slashing",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "low_hp_bonus",
+            "amount": 0.2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Wraith",
+      "ability": {
+        "id": "desire_control",
+        "name": "Desire Control",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 45,
+        "cooldown": 3,
+        "description": "Desire Control — Suppresses target desires, silencing active skills for 1 round.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "silenced",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Puppet",
+      "ability": {
+        "id": "spiteful_shackles",
+        "name": "Spiteful Shackles",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Spiteful Shackles — Binds enemy with cursed chains (170% ATK DMG) and reduces target Speed by 35%.",
+        "stat": "ATK",
+        "scale": 1.7,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.35,
+            "stat": "speed",
+            "duration": 2
+          },
+          {
+            "type": "status",
+            "status": "bound",
+            "chance": 1,
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Disciple of Silence",
+      "ability": {
+        "id": "zombie_legion",
+        "name": "Zombie Legion",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 65,
+        "cooldown": 4,
+        "description": "Zombie Legion — Summons zombie horde absorbing 25% Max HP damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.25,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Ancient Bane",
+      "ability": {
+        "id": "abomination_form",
+        "name": "Abomination Form",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 85,
+        "cooldown": 4,
+        "description": "Abomination Form — Transforms into abomination (+30% DEF armor, deals 260% ATK DMG on hit).",
+        "stat": "ATK",
+        "scale": 2.6,
+        "damageType": "physical",
+        "formula": "empowered_hybrid_physical",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "buff",
+            "amount": 0.3,
+            "stat": "def",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Abomination",
+      "ability": {
+        "id": "spiteful_depravity",
+        "name": "Spiteful Depravity",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 100,
+        "cooldown": 4,
+        "description": "Spiteful Depravity — Deals 320% ATK Slashing DMG; executes targets below 15% HP.",
+        "stat": "ATK",
+        "scale": 3.2,
+        "damageType": "slashing",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "execute",
+            "threshold": 0.15,
+            "multiplier": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "Chained",
+      "ability": {
+        "id": "god_of_chains",
+        "name": "God of Chains",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 125,
+        "cooldown": 5,
+        "description": "God of Chains — Enchains reality dealing 410% ATK Slashing True DMG.",
+        "stat": "ATK",
+        "scale": 4.1,
+        "damageType": "true",
+        "formula": "empowered_hybrid_physical",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "bound",
+            "chance": 1,
+            "duration": 1
+          },
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    }
+  ]
+}

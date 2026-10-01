@@ -1,0 +1,307 @@
+{
+  "schema": "pathway.v1",
+  "key": "fool",
+  "name": "Fool",
+  "group": "Lord of Mysteries",
+  "archetype": "Caster",
+  "material": "Spirit Thread",
+  "mythicalForm": "Swarm of Worms of Spirit",
+  "survival": [
+    "Paper Figurine Rebound [Escape]",
+    "Bizarro Swap [Escape]",
+    "Miracle Rebirth [Heal]"
+  ],
+  "role": "Evasion / Control / Marionettes / Reality",
+  "intro": "The Fool pathway revolves around Seers who manipulate perception, probability, space and the threads of fate. It favors adaptability, deception and increasingly powerful mystical authority.",
+  "meter": {
+    "name": "Thread Control",
+    "key": "threadControl",
+    "max": 100,
+    "gain": "Maintaining Spirit Body Threads",
+    "spend": "Starting and completing threads",
+    "full": "Next thread gains resistance penetration",
+    "special": "Thread Control",
+    "characteristic": "Spirit / Control",
+    "quirkName": "Spirit Body Threads",
+    "quirkText": "Combat-only control through deception, threads, miracles and reality manipulation."
+  },
+  "sequences": [
+    {
+      "sequence": 9,
+      "name": "Seer",
+      "ability": {
+        "id": "spirit_vision",
+        "name": "Spirit Vision",
+        "kind": "passive",
+        "label": "Passive",
+        "spCost": 0,
+        "cooldown": 0,
+        "description": "Spirit Vision -- +10% INT. Critical attacks deal +10% additional critical damage.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "stat_modifier",
+            "stat": "int",
+            "amount": 0.1
+          },
+          {
+            "type": "critDamage",
+            "amount": 0.1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "name": "Clown",
+      "ability": {
+        "id": "paper_card_dagger",
+        "name": "Paper Card Dagger",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 15,
+        "cooldown": 1,
+        "description": "Paper Card Dagger — Throws spiritually sharpened cards dealing 140% INT Physical DMG; ignores 20% DEF.",
+        "stat": "INT",
+        "scale": 1.4,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "defense_penetration",
+            "amount": 0.2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "name": "Magician",
+      "ability": {
+        "id": "paper_figurine_rebound",
+        "name": "Paper Figurine Rebound",
+        "kind": "active",
+        "label": "Active Stance",
+        "spCost": 30,
+        "cooldown": 3,
+        "description": "Paper Figurine Rebound — 50% damage reduction + reflects 100% INT Fire DMG back to attacker on hit.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "fire",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "damage_taken",
+            "amount": -0.5,
+            "duration": "next_turn"
+          },
+          {
+            "type": "reflect",
+            "mode": "stat",
+            "stat": "INT",
+            "multiplier": 1.0,
+            "element": "fire",
+            "duration": "next_turn"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "name": "Faceless",
+      "ability": {
+        "id": "combat_stance_mimicry",
+        "name": "Combat Stance Mimicry",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 30,
+        "cooldown": 2,
+        "description": "Combat Stance Mimicry — Copies highest stat from target enemy (+15%) for 2 rounds; lowers target DEF by 15%.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "debuff",
+            "amount": 0.15,
+            "stat": "def",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "name": "Marionettist",
+      "ability": {
+        "id": "thread_binding",
+        "name": "Thread Binding",
+        "kind": "active",
+        "label": "Active Control",
+        "spCost": 45,
+        "cooldown": 5,
+        "description": "Thread Binding — Accumulates 1 stack/turn (+20% control). 5 stacks = INSTANT DEATH & Marionette Conversion. Damage >=12% HP severs 1 stack.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "execute",
+            "threshold": 0.25,
+            "multiplier": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "name": "Bizarro Sorcerer",
+      "ability": {
+        "id": "bizarro_transformation",
+        "name": "Bizarro Transformation",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 50,
+        "cooldown": 3,
+        "description": "Bizarro Transformation — Deals 180% INT Metaphysical DMG while swapping positions with a marionette/projection to evade strikes.",
+        "stat": "INT",
+        "scale": 1.8,
+        "damageType": "metaphysical",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "evade",
+            "duration": 1
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "name": "Scholar of Yore",
+      "ability": {
+        "id": "historical_summoning",
+        "name": "Historical Summoning",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 60,
+        "cooldown": 3,
+        "description": "Historical Summoning — Summons a historical projection absorbing 25% Max HP damage or reproducing a Seq 5/4 ability.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Defense",
+        "effects": [
+          {
+            "type": "shield",
+            "maxHpRatio": 0.25,
+            "fullHp": false
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "name": "Miracle Invoker",
+      "ability": {
+        "id": "miracle_rebirth",
+        "name": "Miracle Rebirth",
+        "kind": "passive",
+        "label": "Passive Revival",
+        "spCost": 0,
+        "cooldown": 99,
+        "description": "Miracle Rebirth — Resurrects once per match with 25% Max HP upon fatal damage. Consumes remaining SP & inflicts 1-turn Spiritual Exhaustion.",
+        "stat": "INT",
+        "scale": 0,
+        "damageType": "physical",
+        "formula": "pure_caster_ability",
+        "tag": "Heal",
+        "effects": [
+          {
+            "type": "revive",
+            "self": false,
+            "hpRatio": 1.0
+          },
+          {
+            "type": "revive",
+            "self": false,
+            "hpRatio": 0.25
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 1,
+      "name": "Attendant of Mysteries",
+      "ability": {
+        "id": "conceptual_grafting",
+        "name": "Conceptual Grafting",
+        "kind": "active",
+        "label": "Active",
+        "spCost": 90,
+        "cooldown": 4,
+        "description": "Conceptual Grafting — Transfers all team debuffs onto target enemy while dealing 300% INT True Damage.",
+        "stat": "INT",
+        "scale": 3.0,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "transfer_debuffs"
+          },
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 0,
+      "name": "The Fool",
+      "ability": {
+        "id": "fooling_reality",
+        "name": "Fooling Reality",
+        "kind": "active",
+        "label": "Active Authority",
+        "spCost": 120,
+        "cooldown": 5,
+        "description": "Fooling Reality — Fools reality: forces all enemies to skip turn for 1 round, deals 350% INT True DMG, grants status immunity.",
+        "stat": "INT",
+        "scale": 3.5,
+        "damageType": "true",
+        "formula": "pure_caster_ability",
+        "tag": null,
+        "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
+          {
+            "type": "damage_rule",
+            "rule": "true"
+          },
+          {
+            "type": "status",
+            "status": "stunned",
+            "duration": 1
+          }
+        ]
+      }
+    }
+  ]
+}
