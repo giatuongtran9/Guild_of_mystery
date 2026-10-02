@@ -105,7 +105,7 @@
             "type": "reflect",
             "mode": "stat",
             "stat": "INT",
-            "multiplier": 1.0,
+            "multiplier": 1,
             "element": "fire",
             "duration": "next_turn"
           }
@@ -159,6 +159,69 @@
             "type": "execute",
             "threshold": 0.25,
             "multiplier": 1.5
+          }
+        ],
+        "threadStages": [
+          {
+            "stage": 1,
+            "description": "-15% Speed",
+            "effects": [
+              {
+                "type": "debuff",
+                "stat": "speed",
+                "amount": 0.15
+              }
+            ]
+          },
+          {
+            "stage": 2,
+            "description": "-10% Dodge and Hit Chance",
+            "effects": [
+              {
+                "type": "debuff_hit",
+                "amount": 0.1
+              },
+              {
+                "type": "dodge",
+                "amount": -0.1
+              }
+            ]
+          },
+          {
+            "stage": 3,
+            "description": "-20% Speed (35% total), Dodge locked to 0%",
+            "effects": [
+              {
+                "type": "debuff",
+                "stat": "speed",
+                "amount": 0.2
+              },
+              {
+                "type": "dodge",
+                "amount": -1
+              }
+            ]
+          },
+          {
+            "stage": 4,
+            "description": "30% chance to bind the target and skip their turn",
+            "effects": [
+              {
+                "type": "status_chance",
+                "status": "bound",
+                "chance": 0.3,
+                "duration": 1
+              }
+            ]
+          },
+          {
+            "stage": 5,
+            "description": "Instant death & Marionette conversion",
+            "effects": [
+              {
+                "type": "execute"
+              }
+            ]
           }
         ]
       }
@@ -233,7 +296,7 @@
           {
             "type": "revive",
             "self": false,
-            "hpRatio": 1.0
+            "hpRatio": 1
           },
           {
             "type": "revive",
@@ -255,7 +318,7 @@
         "cooldown": 4,
         "description": "Conceptual Grafting — Transfers all team debuffs onto target enemy while dealing 300% INT True Damage.",
         "stat": "INT",
-        "scale": 3.0,
+        "scale": 3,
         "damageType": "true",
         "formula": "pure_caster_ability",
         "tag": null,
