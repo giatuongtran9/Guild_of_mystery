@@ -103,5 +103,12 @@ function tryMythicalForm(agent, actor, state, lines, r) {
     const sh = Math.round(actor.maxHp * .30); actor.shield = Math.max(actor.shield || 0, sh);
     lines.push({ text: `MYTHICAL FORM: ${actor.name} becomes ${pathOf(agent.path).mythicalForm || 'a mythical creature'} (+${sh} HP shield, +20% damage).`, kind: 'action' });
   }
-  if (actor._inForm) for (const f of foesOf(actor, state)) if (f.alive && r() < .20) { addStatus(f, 'stunned', 1, actor.name); lines.push({ text: `${f.name} is overwhelmed by mental pollution and loses a turn.`, kind: 'status' }); }
+  if (r() < 0.2) { 
+    for (const f of foesOf(actor, state)) {
+      if (f.alive) { 
+        addStatus(f, 'stunned', 1, actor.name); 
+        lines.push({ text: `${f.name} is overwhelmed by mental pollution and loses a turn.`, kind: 'status' }); 
+      }
+    }
+  }
 }
