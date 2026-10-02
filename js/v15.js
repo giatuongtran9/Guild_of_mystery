@@ -98,7 +98,7 @@ function tryRevive(t, lines) {
 // and every turn each enemy has a 20% chance to lose its turn. Abilities remain castable.
 function tryMythicalForm(agent, actor, state, lines, r) {
   const unlocked = agent.sequence <= MYTHIC.unlocked_at_sequence;
-  if (unlocked && !actor._formUsed && (agent.sp || 0) >= MYTHIC.sp_cost && actor.hp / Math.max(1, actor.maxHp) < .85) {
+  if (unlocked && !actor._formUsed && (agent.sp || 0) >= MYTHIC.sp_cost && actor.hp / Math.max(1, actor.maxHp) < MYTHIC.hp_threshold ?? 0.5) {
     agent.sp -= MYTHIC.sp_cost; actor._formUsed = true; actor._inForm = true; actor._formBoost = Math.max(actor._formBoost || 1, 1.20);
     const sh = Math.round(actor.maxHp * .30); actor.shield = Math.max(actor.shield || 0, sh);
     lines.push({ text: `MYTHICAL FORM: ${actor.name} becomes ${pathOf(agent.path).mythicalForm || 'a mythical creature'} (+${sh} HP shield, +20% damage).`, kind: 'action' });
