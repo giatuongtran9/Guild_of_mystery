@@ -374,6 +374,14 @@ function chooseStructuredAbility(agent,actor,enemy,state){
  // Fool: bank SP for Thread Binding (45 SP) instead of spending it on cheap casts every round.
  if(agent.path==='fool'&&agent.sequence<=5&&abilityAvailable(agent,'thread_binding')&&!(agent.cooldowns?.thread_binding>0)&&(agent.sp||0)<45)return null;
  if(agent.path==='error' && agent.sequence===9){const x=specs.find(s=>s.id==='combat_theft'||s.effectId==='combat_theft');if(x)return x;}
+
+ // Time Theft: if all enemies have already moved this round, skip Time Theft and pick another skill
+ const enemiesPendingAction = foesOf(actor, state).filter(e => e.alive && !e._actedThisRound);
+ if (enemiesPendingAction.length === 0) {
+   specs = specs.filter(s => s.id !== 'time_theft' && s.effectId !== 'time_theft');
+   if (!specs.length) return null;
+ }
+  
  const survival=specs.find(x=>x.tag==='Heal'||x.tag==='Defense'||x.tag==='Escape');
  if(hpRatio<.50&&survival)return survival;
  const control=specs.find(x=>abilityEffects(x).some(e=>['status','status_chance','skip','banish','silence'].includes(e.type)));
@@ -392,6 +400,12 @@ function chooseStructuredAbility(agent,actor,enemy,state){
  return specs.find(useful)||null;
 }
 function targetsForEffects(spec,actor,enemy,state){
+ // If casting Time Theft, target an enemy who has not taken their turn yet this round
+  if (spec.id === 'time_theft' || spec.effectId === 'time_theft') {
+    const pending = foesOf(actor, state).filter(x => x.alive && !x._actedThisRound);
+    if (pending.length > 0) return [pending[0]];
+  }
+  
  const targeting=abilityEffects(spec).find(e=>e.type==='targeting');
  if(targeting?.mode==='all_enemies')return foesOf(actor,state).filter(x=>x.alive);
  if(targeting?.mode==='up_to_3_enemies')return foesOf(actor,state).filter(x=>x.alive).slice(0,3);
@@ -542,13 +556,15 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
  for(const a of allies)lines.push({text:`${a.name} — ${a.agent.path?`${pathOf(a.agent.path).name} · Sequence ${a.agent.sequence}`:'Unawakened'}.`,kind:'system'});
  let round=0;
  while(allies.some(x=>x.alive)&&enemies.some(x=>x.alive)&&round<15){round++;state.currentRound=round;startRoundCombatResources([...allies,...enemies],lines);lines.push({text:`· Round ${round} ·`,kind:'system'});
+   for (const u of [...allies, ...enemies]) u._actedThisRound = false;                                                                
    const initiativeLine=[...allies.filter(x=>x.alive),...enemies.filter(x=>x.alive)].sort((a,b)=>{const sa=unitInitiative(a);const sb=unitInitiative(b);return sb-sa;}).map(x=>`${x.name} ${unitInitiative(x).toFixed(1)}`).join(' → '); lines.push({text:`Initiative: ${initiativeLine}`,kind:'system'});
    processSpiritThreads(state,lines);                                                                 
    for(const unit of [...allies,...enemies])processStatuses(unit,t=>lines.push({text:t,kind:'status'}));
    tickCombatEffectDurations([...allies,...enemies]);applyPassiveAuras([...allies,...enemies],state);
    const order=[...allies.filter(x=>x.alive),...enemies.filter(x=>x.alive)].sort((a,b)=>unitInitiative(b)-unitInitiative(a));
    const actors=order;
-   for(const c of actors){if(!c.alive||c.inCombat===false)continue;beginTurn(c);if(c.agent){const pressure=0;
+   for(const c of actors){if(!c.alive||c.inCombat===false)continue;beginTurn(c);c._actedThisRound = true;
+       if(c.agent){const pressure=0;
        if((c.agent.madness||0)>=50&&r()<.18){lines.push({text:`${c.name} loses the action to mounting Madness.`,kind:'status'});continue;}if(actionDisabled(c)){lines.push({text:`${c.name} loses the action to Crowd Control.`,kind:'status'});continue;}
        if(c.thread&&c.thread.progress>=4&&r()<0.30){addStatus(c,'bound',1,'Spirit Body Thread');}if(hasStatus(c,'fear')&&r()<.35){lines.push({text:`${c.name} loses this action to a status effect.`,kind:'status'});continue;}const target=enemies.filter(e=>e.alive);if(!target.length)break;const enemy=pickR(r,tauntFilter(c,(()=>{const ok=target.filter(x=>!hasStatus(x,'untargetable'));return ok.length?ok:target;})()));if(!state.combatStatsShown)state.combatStatsShown={};if(!state.combatStatsShown[enemy.id]){lines.push({text:`Combat begins: ${enemy.name} · HP ${enemy.maxHp} · ATK ${enemy.atk} · DEF ${enemy.def} · INT ${enemy.int} · Speed ${speedFor(enemy).toFixed(1)} · AV ${actionValueFor(enemy).toFixed(1)}.`,kind:'system'});state.combatStatsShown[enemy.id]=true;}powerEffect(c.agent,c,enemy,state,lines,r); if(c._extraTurns>0&&c.alive){c._extraTurns--;powerEffect(c.agent,c,enemy,state,lines,r);}}
      else {const targets=allies.filter(x=>x.alive&&x.inCombat);if(!targets.length)break;if(actionDisabled(c)){lines.push({text:`${c.name} loses the action to Crowd Control.`,kind:'status'});continue;}
