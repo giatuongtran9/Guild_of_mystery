@@ -478,7 +478,7 @@ function powerEffect(a,actor,enemy,state,lines,r){
     const threadCd = Number(threadSpec?.cooldown ?? 5);
     if((a.sp||0)>=threadCost && !(a.cooldowns?.thread_binding>0)){
       a.sp-=threadCost; a.cooldowns.thread_binding=threadCd > 0 ? threadCd + 1 : 0;
-      lines.push({text:`ACTION: ${actor.name} casts [Thread Binding] (Cost: 45 SP | 5-Turn CD).`,kind:'action'});
+      lines.push({text:`ACTION: ${actor.name} casts [Thread Binding] (Cost: ${threadCost} SP | ${threadCd}-Turn CD).`,kind:'action'});
       if(applySpiritThread(a,enemy,actor,state,lines,r))return true;
     }
   }
