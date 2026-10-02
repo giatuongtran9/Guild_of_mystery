@@ -164,14 +164,14 @@ function applySpiritThread(agent,enemy,actor,state,lines,r){
  actor._threadAttempts=(actor._threadAttempts||0)+1;
  const intGap=(enemy.resistanceInt??enemy.int)-agent.stats.int;
  const resist=Math.max(.08,Math.min(.70,({5:.62,4:.55,3:.45,2:.35,1:.25,0:.20})[agent.sequence]+Math.max(0,enemy.sequence-agent.sequence)*.16+Math.max(0,intGap)/Math.max(1,agent.stats.int)*.5));
- if(r()<resist){lines.push({text:`${enemy.name} resists the Spirit Body Thread.`,kind:'status'});changeMeter(agent,'fool',5);return false;}
+ if(r()<resist){lines.push({text:`${enemy.name} resists the Spirit Body Thread.`,kind:'status'});changeMeter(agent,'fool',5); if (actor._threadAttempts > 0) actor._threadAttempts--; return false;}
  const required=({5:3,4:2,3:2,2:1,1:1,0:1})[agent.sequence]||2; // rounds the thread must be held; combat is now genuinely multi-round
  enemy.thread={ownerId:agent.id,progress:0,required:required+(intGap>agent.stats.int*.23?1:0),range};
  agent.threadTargets=[...(agent.threadTargets||[]),enemy.id];agent.activeThreads=agent.threadTargets.length;changeMeter(agent,'fool',-12);
  addStatus(enemy,'threaded',enemy.thread.required,'Spirit Body Thread');
  lines.push({text:`${actor.name} grasps the invisible Spirit Body Thread attached to ${enemy.name}.`,kind:'quirk'});return true;
 }
-function processSpiritThreads(state,lines){const allUnits=[...state.allies,...state.enemies];for(const ally of allUnits.filter(x=>x.alive&&isThreadBeyonder(x.agent||x))){const agent=ally.agent||ally;const targets=state.allies.includes(ally)?state.enemies:state.allies;for(const enemy of targets.filter(x=>x.thread?.ownerId===agent.id)){const t=enemy.thread;if(!enemy.alive){releaseThread(agent,enemy);lines.push({text:`The thread ends because ${enemy.name} is dead; the slot is freed.`,kind:"system"});continue;}if(!ally.alive||hasThreadCC(ally)||enemy.distance>t.range){releaseThread(agent,enemy);lines.push({text:`The thread on ${enemy.name} is interrupted and its progress resets.`,kind:"status"});continue;}t.progress++;
+function processSpiritThreads(state,lines){const allUnits=[...state.allies,...state.enemies];for(const ally of allUnits.filter(x=>x.alive&&isThreadBeyonder(x.agent||x))){const agent=ally.agent||ally;const targets=state.allies.includes(ally)?state.enemies:state.allies;for(const enemy of targets.filter(x=>x.thread?.ownerId===agent.id)){const t=enemy.thread;if(!enemy.alive){releaseThread(agent,enemy);lines.push({text:`The thread ends because ${enemy.name} is dead; the slot is freed.`,kind:"system"});continue;}if(!ally.alive||hasThreadCC(ally)||enemy.distance>t.range){releaseThread(agent,enemy);lines.push({text:`The thread on ${enemy.name} is interrupted and its progress resets.`,kind:"status"});if (ally._threadAttempts > 0) ally._threadAttempts--;continue;}t.progress++;
       if(t.progress===1){
         enemy._threadSpeedDebuff=0.15;
       }else if(t.progress===2){
@@ -476,10 +476,10 @@ function powerEffect(a,actor,enemy,state,lines,r){
     const threadSpec = unlockedAbilities(a).find(x => x.effectId === 'thread_binding' || x.id === 'thread_binding');
     const threadCost = Number(threadSpec?.costSP ?? 45);
     const threadCd = Number(threadSpec?.cooldown ?? 5);
-    if((a.sp||0)>=threadCost && !(a.cooldowns?.thread_binding>0)){
+    if(!enemy.thread && (a.sp||0)>=threadCost && !(a.cooldowns?.thread_binding>0)){
       a.sp-=threadCost; a.cooldowns.thread_binding=threadCd > 0 ? threadCd + 1 : 0;
       lines.push({text:`ACTION: ${actor.name} casts [Thread Binding] (Cost: ${threadCost} SP | ${threadCd}-Turn CD).`,kind:'action'});
-      if(applySpiritThread(a,enemy,actor,state,lines,r))return true;
+      applySpiritThread(a,enemy,actor,state,lines,r) return true;
     }
   }
   const spec=chooseStructuredAbility(a,actor,enemy,state);
