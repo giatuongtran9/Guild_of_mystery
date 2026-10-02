@@ -33,6 +33,7 @@
     "activation_limit": "Once per battle",
     "sp_cost": 50,
     "unlocked_at_sequence": 4,
+    "hp_threshold": 0.5,
     "stance_buffs": {
       "hp_shield": "+30% Max HP Shield",
       "damage_bonus": "+20% All Damage",
