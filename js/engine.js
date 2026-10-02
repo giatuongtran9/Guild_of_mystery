@@ -404,7 +404,9 @@ function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
  
  if((agent.sp||0)<cost)return false;
  const misfire=effectAmount(spec,'skill_misfire','chance',effectAmount(spec,'skill_misfire')); if(misfire&&r()<misfire){agent.sp-=cost;agent.cooldowns[spec.effectId]=Number(spec.cooldown||0);lines.push({text:`ACTION: ${actor.name}'s ${spec.text.split(' — ')[0]} misfires.`,kind:'status'});return true;}
- agent.sp-=cost;agent.cooldowns[spec.effectId]=Number(spec.cooldown||0)+Number(agent._cooldownPenalty||0);agent._lastAbility=spec.effectId;
+ agent.sp-=cost; 
+ const baseCd = Number(spec.cooldown || 0); 
+ agent.cooldowns[spec.effectId]=baseCd > 0 ? baseCd + 1 : 0)+Number(agent._cooldownPenalty||0);agent._lastAbility=spec.effectId;
  const effects=abilityEffects(spec), allies=sameSideOf(actor,state), targets=targetsForEffects(spec,actor,enemy,state);
  lines.push({text:`ACTION: ${actor.name} casts [${spec.text.split(' — ')[0]}] (Cost: ${cost} SP | ${spec.cooldown||0}-Turn CD).`,kind:'action'});
  for(const e of effects){
@@ -471,8 +473,11 @@ function defPen(spec,effects){return effects.filter(e=>e.type==='defPen'||e.type
 function powerEffect(a,actor,enemy,state,lines,r){
   ensureCombatResource(a); a._hpRatio=actor.hp/Math.max(1,actor.maxHp); tryMythicalForm(a,actor,state,lines,r);
   if(a.path==='fool'&&a.sequence<=5&&abilityAvailable(a,'thread_binding')){
-    if((a.sp||0)>=45 && !(a.cooldowns?.thread_binding>0)){
-      a.sp-=45; a.cooldowns.thread_binding=6;
+    const threadSpec = unlockedAbilities(a).find(x => x.effectId === 'thread_binding' || x.id === 'thread_binding');
+    const threadCost = Number(threadSpec?.costSP ?? 45);
+    const threadCd = Number(threadSpec?.cooldown ?? 5);
+    if((a.sp||0)>=threadCost && !(a.cooldowns?.thread_binding>0)){
+      a.sp-=threadCost; a.cooldowns.thread_binding=threadCd > 0 ? threadCd + 1 : 0;
       lines.push({text:`ACTION: ${actor.name} casts [Thread Binding] (Cost: 45 SP | 5-Turn CD).`,kind:'action'});
       if(applySpiritThread(a,enemy,actor,state,lines,r))return true;
     }
@@ -543,7 +548,6 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
 
    }
    }
-   processSpiritThreads(state,lines);
  }
  const success=allies.some(x=>x.alive&&x.inCombat)&&!enemies.some(x=>x.alive); if(success)lines.push({text:'The hostile force is defeated and the guild completes the contract.',kind:'victory'});else lines.push({text:'The guild is defeated in the encounter.',kind:'failure'});
  for(const u of allies){const a=u.agent;const gain=digestGain(quest,individual,a);if(success){
