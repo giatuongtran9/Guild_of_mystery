@@ -304,6 +304,12 @@
           },
           {
             "type": "strip_buffs"
+          },
+          {
+            "type": "status",
+            "status": "silenced",
+            "chance": 1,
+            "duration": 1
           }
         ]
       }
