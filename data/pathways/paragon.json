@@ -66,12 +66,18 @@
         "label": "Active",
         "spCost": 15,
         "cooldown": 1,
-        "description": "Crafted Blade — Deals 135% ATK Physical Piercing DMG.",
+        "description": "Crafted Blade — Deals 135% ATK Physical Piercing DMG; ignores 20% DEF.",
         "stat": "ATK",
         "scale": 1.35,
         "damageType": "piercing",
         "formula": "empowered_hybrid_physical",
-        "tag": null
+        "tag": null,
+        "effects": [
+          {
+            "type": "defense_penetration",
+            "amount": 0.2
+          }
+        ]
       }
     },
     {
