@@ -353,6 +353,7 @@ function resolveIncoming(attacker,defender,dmg,state,lines,r,opt={}){
   const mult=incomingMultiplier(defender);
   if(mult!==1&&rem>0){const reduced=Math.max(0,Math.round(rem*mult));if(reduced!==rem)lines.push({text:`${defender.name}'s damage ${mult<1?'reduction':'vulnerability'} changes ${rem} damage to ${reduced}.`,kind:'status'});rem=reduced;}
   defender.hp-=rem;res.hpLoss=rem;
+  if(defender.hp>0&&defender.agent){tryMythicalForm(defender.agent,defender,state,lines,r);}
  }
  if(rf&&attacker&&attacker!==defender&&attacker.alive){
   let refl=0;
@@ -366,7 +367,8 @@ function resolveIncoming(attacker,defender,dmg,state,lines,r,opt={}){
    const rr=resolveIncoming(defender,attacker,refl,state,lines,r,{reflect:true});
    if(state)state._inReflect=false;
    res.reflected=rr.hpLoss+rr.absorbed;
-   if(attacker.hp<=0){attacker.hp=0;attacker.alive=false;lines.push({text:`${attacker.name} falls.`,kind:'victory'});tryRevive(attacker,lines);}
+   emitCombatEvent(state,{round:state?.currentRound||1,type:'damage',actorId:defender.id,actorName:defender.name,actorTeam:teamOf(defender,state),targetId:attacker.id,targetName:attacker.name,targetTeam:teamOf(attacker,state),amount:refl,damageType:rf.element||'reflected',isReflect:true,text:`${defender.name} reflects ${refl} damage back at ${attacker.name}.`});
+   if(attacker.hp<=0){attacker.hp=0;attacker.alive=false;lines.push({text:`${attacker.name} falls.`,kind:'victory'});emitCombatEvent(state,{round:state?.currentRound||1,type:'death',actorId:defender.id,actorName:defender.name,actorTeam:teamOf(defender,state),targetId:attacker.id,targetName:attacker.name,targetTeam:teamOf(attacker,state),text:`${attacker.name} falls.`});tryRevive(attacker,lines,state);}
   }
  }
  return res;
@@ -410,9 +412,21 @@ function tickFx(u){
 function hasStatus(target,status){return !!target?.status?.includes(status);}
 const SELF_STATUSES=['evade','untargetable','guarded','inspired','possession_phase'];
 function statusImmune(t,s){try{return (passiveCombatModifier(t?.agent||t).immunities||[]).includes(s);}catch(e){return false;}}
-function addStatus(target,status,duration=1,source="unknown"){if(statusImmune(target,status))return;target.status=target.status||[];target.statusMeta=target.statusMeta||{};if(!target.status.includes(status))target.status.push(status);target.statusMeta[status]={duration,source};}
+function addStatus(target,status,duration=1,source="unknown",extraMeta={}){if(statusImmune(target,status))return;target.status=target.status||[];target.statusMeta=target.statusMeta||{};if(!target.status.includes(status))target.status.push(status);target.statusMeta[status]={duration,source,...(extraMeta||{})};}
 function removeStatus(target,status){if(!target?.status)return;target.status=target.status.filter(x=>x!==status);if(target.statusMeta)delete target.statusMeta[status];}
-function processStatuses(unit,add){if(!unit.alive)return;unit.status=unit.status||[];unit.statusMeta=unit.statusMeta||{};const isUntargetable=hasStatus(unit,"untargetable");if(!isUntargetable){if(hasStatus(unit,"burn")){const d=Math.max(1,Math.round(unit.maxHp*.07));unit.hp-=d;add(`${unit.name} suffers ${d} Burn damage (7% Max HP).`);} if(hasStatus(unit,"poison")){const d=Math.max(1,Math.round(unit.maxHp*.05));unit.hp-=d;add(`${unit.name} suffers ${d} Poison damage (5% Max HP).`);} if(hasStatus(unit,"curse")){const d=Math.max(1,Math.round(unit.maxHp*.03));unit.hp-=d;add(`${unit.name} suffers ${d} Curse damage (3% Max HP).`);} if(hasStatus(unit,"decay")){const d=Math.max(1,Math.round(unit.maxHp*.025));unit.hp-=d;add(`${unit.name} withers under Decay.`);} if(hasStatus(unit,'bleed')){const d=Math.max(1,Math.round(unit.maxHp*.03));unit.hp-=d;add(`${unit.name} loses ${d} HP to Bleed (3% Max HP).`);} }for(const st of [...unit.status]){const m=unit.statusMeta[st];if(m){m.duration--;if(m.duration<=0)removeStatus(unit,st);}} if(unit.hp<=0){unit.hp=0;unit.alive=false;}}
+function processStatuses(unit,add){if(!unit.alive)return;unit.status=unit.status||[];unit.statusMeta=unit.statusMeta||{};const isUntargetable=hasStatus(unit,"untargetable");if(!isUntargetable){if(hasStatus(unit,"burn")){const d=Math.max(1,Math.round(unit.maxHp*.07));unit.hp-=d;add(`${unit.name} suffers ${d} Burn damage (7% Max HP).`);} if(hasStatus(unit,"poison")){const d=Math.max(1,Math.round(unit.maxHp*.05));unit.hp-=d;add(`${unit.name} suffers ${d} Poison damage (5% Max HP).`);} if(hasStatus(unit,"curse")){const d=Math.max(1,Math.round(unit.maxHp*.03));unit.hp-=d;add(`${unit.name} suffers ${d} Curse damage (3% Max HP).`);} if(hasStatus(unit,"decay")){const d=Math.max(1,Math.round(unit.maxHp*.025));unit.hp-=d;add(`${unit.name} withers under Decay.`);} if(hasStatus(unit,'bleed')){const d=Math.max(1,Math.round(unit.maxHp*.03));unit.hp-=d;add(`${unit.name} loses ${d} HP to Bleed (3% Max HP).`);} }if(unit.hp<=0){unit.hp=0;unit.alive=false;}}
+
+
+function tickUnitStatuses(unit){
+  if(!unit||!unit.status||!unit.statusMeta)return;
+  for(const st of [...unit.status]){
+    const m=unit.statusMeta[st];
+    if(m){
+      m.duration--;
+      if(m.duration<=0)removeStatus(unit,st);
+    }
+  }
+}
 
 function isThreadBeyonder(agent) {
   return agent.path === "fool" && agent.sequence <= 5;
@@ -493,7 +507,7 @@ function passiveCombatModifier(agent){
  if(agent._buffs){atk*=agent._buffs.atk||1;def*=agent._buffs.def||1;int*=agent._buffs.int||1;}
  return {atk,def,int,damageTaken,crit,critDamage,initiative,counter,dodge,lifesteal,defPen,hp,hitChance,resistances,immunities,spellPen,statusResist};
 }
-function statusCombatModifier(actor){const m={atk:1,int:1,def:1,crit:0,critDamage:0,dodge:0,counter:0};for(const st of actor?.status||[]){if(st==='inspired'){m.atk*=1.08;m.int*=1.05;}if(st==='guarded')m.def*=1.10;if(st==='evade')m.dodge+=.25;if(st==='weakened')m.atk*=.90;if(st==='freeze'||st==='curse')m.def*=.90;}return m;}
+function statusCombatModifier(actor){const m={atk:1,int:1,def:1,crit:0,critDamage:0,dodge:0,counter:0};for(const st of actor?.status||[]){if(st==='inspired'){m.atk*=1.08;m.int*=1.05;}if(st==='guarded')m.def*=1.10;if(st==='evade'){const dr=Number(actor?.statusMeta?.['evade']?.dodgeRate??0.25);m.dodge+=dr;}if(st==='weakened')m.atk*=.90;if(st==='freeze'||st==='curse')m.def*=.90;}return m;}
 function basePathSpeed(path,sequence=9){
   // Base Pathway Speed is the 5th column of STAT_TABLE. Ordinary humans (Sequence 10) use a flat low value.
   if(!path||sequence>=10) return 55;
@@ -602,7 +616,7 @@ function attackOnce(agent,actor,enemy,state,lines,r,mult=1){
    maxHp: enemy.maxHp
  });
  if(enemy.hp>0&&weapon.bleed&&r()<weapon.bleed){addStatus(enemy,'bleed',3,actor.name);enemy.statusMeta.bleed.sourceAgent=cloneE(agent);lines.push({text:`${actor.name}'s ${weapon.name} causes Bleed.`,kind:'status'});}
- if(enemy.hp<=0){enemy.hp=0;enemy.alive=false;lines.push({text:`${enemy.name} falls.`,kind:'victory'});emitCombatEvent(state,{round:state?.currentRound||1,type:'death',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:enemy.id,targetName:enemy.name,targetTeam:teamOf(enemy,state),text:`${enemy.name} falls.`});tryRevive(enemy,lines);} else if(enemy.agent){maybeCounter(enemy,actor,state,lines,r);}
+ if(enemy.hp<=0){enemy.hp=0;enemy.alive=false;lines.push({text:`${enemy.name} falls.`,kind:'victory'});emitCombatEvent(state,{round:state?.currentRound||1,type:'death',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:enemy.id,targetName:enemy.name,targetTeam:teamOf(enemy,state),text:`${enemy.name} falls.`});tryRevive(enemy,lines,state);} else if(enemy.agent){maybeCounter(enemy,actor,state,lines,r);}
  return true;
 }
 function sameSideOf(actor,state){return state.allies.includes(actor)?state.allies:state.enemies;}
@@ -833,7 +847,7 @@ function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
   else if(e.type==='heal')for(const t of tgs){if(hasStatus(t,'no_heal'))continue;const amount=Math.round(t.maxHp*Number(e.maxHpRatio||0)+(e.scaling==='INT'?agent.stats.int*Number(e.multiplier||0):0));if(amount>0){const beforeHp=t.hp;t.hp=Math.min(t.maxHp,t.hp+amount);const restored=t.hp-beforeHp;lines.push({text:`${t.name} recovers ${restored} HP (${t.hp}/${t.maxHp}).`,kind:'status'});emitCombatEvent(state,{round:state?.currentRound||1,type:'heal',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:t.id,targetName:t.name,targetTeam:teamOf(t,state),amount:restored,hpAfter:t.hp,maxHp:t.maxHp});}}
   else if(e.type==='buff')for(const t of tgs){const d=fxDuration(e,'buff'),m=1+Number(e.amount||0);if(e.stat==='all'){for(const k of ['atk','def','int'])addFx(t,'buff',k,m,d);}else addFx(t,'buff',e.stat,m,d);emitCombatEvent(state,{round:state?.currentRound||1,type:'status',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:t.id,targetName:t.name,targetTeam:teamOf(t,state),text:`${t.name} gains +${Math.round((m-1)*100)}% ${e.stat.toUpperCase()} for ${d} round(s)`});}
   else if(e.type==='debuff')for(const t of targets){const d=fxDuration(e,'debuff'),m=1-Number(e.amount||0);if(e.stat==='speed')addFx(t,'speed_debuff','speed',m,d);else if(e.stat==='outgoing')addFx(t,'outgoing','outgoing',m,d);else addFx(t,'debuff',e.stat,m,d);emitCombatEvent(state,{round:state?.currentRound||1,type:'status',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:t.id,targetName:t.name,targetTeam:teamOf(t,state),text:`${t.name} suffers -${Math.round((1-m)*100)}% ${e.stat.toUpperCase()} for ${d} round(s)`});}
-  else if(e.type==='status'){const selfSt=SELF_STATUSES.includes(e.status);for(const t of (selfSt?[actor]:targets))if(t.alive){const mental=['sleep','silenced','confused','charmed','stunned','bound','dreambound','controlled','fear','illusion'].includes(e.status);const resist=(mental&&!selfSt)?Number(combatRates(t.agent||t).resistance||0):0;if((e.chance==null||r()<Number(e.chance))&&r()>=resist&&r()>=(selfSt?0:statusResistChance(t,e.status))){if(e.status==='sleep')t._sleepAppliedThisAction=true;if(e.status==='banished'){const skipTurns=(!t._actedThisRound)?2:1;t._skipTurns=skipTurns;addStatus(t,'untargetable',skipTurns,actor.name);addStatus(t,'banished',skipTurns,actor.name);lines.push({text:`${t.name} is banished into a spatial fold for ${skipTurns} turn(s).`,kind:'status'});}else addStatus(t,e.status,Number(e.duration||1),actor.name);emitCombatEvent(state,{round:state?.currentRound||1,type:'status',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:t.id,targetName:t.name,targetTeam:teamOf(t,state),text:`${t.name} is afflicted with ${e.status} (${e.duration||1} round${Number(e.duration||1)===1?'':'s'})`});}}}
+  else if(e.type==='status'){const selfSt=SELF_STATUSES.includes(e.status);for(const t of (selfSt?[actor]:targets))if(t.alive){const mental=['sleep','silenced','confused','charmed','stunned','bound','dreambound','controlled','fear','illusion'].includes(e.status);const resist=(mental&&!selfSt)?Number(combatRates(t.agent||t).resistance||0):0;if((e.chance==null||r()<Number(e.chance))&&r()>=resist&&r()>=(selfSt?0:statusResistChance(t,e.status))){if(e.status==='sleep')t._sleepAppliedThisAction=true;if(e.status==='banished'){const skipTurns=(!t._actedThisRound)?2:1;t._skipTurns=skipTurns;addStatus(t,'untargetable',skipTurns,actor.name);addStatus(t,'banished',skipTurns,actor.name);lines.push({text:`${t.name} is banished into a spatial fold for ${skipTurns} turn(s).`,kind:'status'});}else addStatus(t,e.status,Number(e.duration||1),actor.name,e.status==='evade'&&e.dodgeRate!==undefined?{dodgeRate:Number(e.dodgeRate)}:{});emitCombatEvent(state,{round:state?.currentRound||1,type:'status',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:t.id,targetName:t.name,targetTeam:teamOf(t,state),text:`${t.name} is afflicted with ${e.status} (${e.duration||1} round${Number(e.duration||1)===1?'':'s'})`});}}}
   else if(e.type==='status_pool'){for(const t of targets)if(t.alive){const pool=e.statuses||[];if(pool.length&&(e.chance==null||r()<Number(e.chance))){const st=pickR(r,pool);addStatus(t,st,Number(e.duration||1),actor.name);}}}
   else if(e.type==='status_chance'){for(const t of targets)if(t.alive){const mental=['sleep','silenced','confused','charmed','stunned','bound','dreambound','controlled','fear','illusion'].includes(e.status);const resist=mental?Number(combatRates(t.agent||t).resistance||0):0;if(r()<Number(e.chance||0)*(1-resist)*(1-statusResistChance(t,e.status)))addStatus(t,e.status,Number(e.duration||1),actor.name);}}
   else if(e.type==='skill_misfire'){const mTargets=foesOf(actor,state).filter(x=>x.alive);for(const t of mTargets){t._skillMisfireChance=Math.max(t._skillMisfireChance||0,Number(e.chance||.3));t._skillMisfireDuration=Math.max(t._skillMisfireDuration||0,Number(e.duration||2));lines.push({text:`${t.name} is afflicted by skill misfire (${Math.round(Number(e.chance||.3)*100)}% chance).`,kind:'status'});}}
@@ -958,7 +972,7 @@ function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
      targetTeam: teamOf(t, state),
      text: `${t.name} falls.`
    });
-   tryRevive(t,lines);
+   tryRevive(t,lines,state);
  }}}
  const healRatio=effects.filter(e=>e.type==='heal_damage_ratio').reduce((n,e)=>n+Number(e.amount||0),0); if(healRatio>0&&didDamage&&!hasStatus(actor,'no_heal'))actor.hp=Math.min(actor.maxHp,actor.hp+Math.round(totalDamage*healRatio));
  const abilityLifeSteal=effects.filter(e=>e.type==='lifesteal').reduce((n,e)=>n+Number(e.ratio||e.amount||0),0)+Number(traitData(agent).lifesteal||0); if(abilityLifeSteal>0&&didDamage&&!hasStatus(actor,'no_heal'))actor.hp=Math.min(actor.maxHp,actor.hp+Math.round(totalDamage*abilityLifeSteal));
