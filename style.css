@@ -99,10 +99,22 @@
   white-space: nowrap;
 }
 .hp-bar-bg {
+  position: relative;
   height: 4px;
   background: #252620;
   border-radius: 2px;
   overflow: hidden;
+}
+.hp-bar-shield {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #ffffff;
+  opacity: 0.85;
+  border-radius: 2px;
+  transition: width 0.25s ease;
+  pointer-events: none;
 }
 .hp-bar-fill {
   height: 100%;
