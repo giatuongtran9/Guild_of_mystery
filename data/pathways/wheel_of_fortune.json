@@ -284,6 +284,10 @@
         "tag": null,
         "effects": [
           {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
+          {
             "type": "damage_rule",
             "rule": "true"
           }
