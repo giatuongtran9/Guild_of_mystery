@@ -338,3 +338,29 @@
     justify-content: space-between;
   }
 }
+
+/* Tree layout for combat outcomes */
+.b-turn-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.b-outcomes-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 3px 0 3px 14px;
+}
+.b-sub-outcome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+.b-tree-branch {
+  color: var(--muted, #888);
+  font-family: monospace;
+  font-weight: bold;
+}
