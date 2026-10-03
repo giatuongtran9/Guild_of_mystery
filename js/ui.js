@@ -149,7 +149,7 @@ function renderTurnRowHtml(row, showDetails) {
     </div>`;
   }
 
-  // Merged action row
+  // Merged action row (tree style)
   const actorClass = row.actorTeam || 'ally';
   const damagesHtml = (row.damages || []).map(d => {
     const targetClass = d.targetTeam || (actorClass === 'ally' ? 'enemy' : 'ally');
@@ -157,22 +157,33 @@ function renderTurnRowHtml(row, showDetails) {
     const badges = [
       d.critical ? '<span class="b-badge crit" title="Critical Hit">💥 CRIT</span>' : '',
       d.trueDamage ? '<span class="b-badge true-dmg" title="True Damage">⚡ TRUE</span>' : '',
-      d.instantKill ? '<span class="b-badge execute" title="Execute">☠️ EXECUTE</span>' : ''
+      d.instantKill ? '<span class="b-badge execute" title="Execute">☠️ EXECUTE</span>' : '',
+      d.isReflect ? '<span class="b-badge reflect" style="background:#5e35b1;color:#fff">🔄 REFLECT</span>' : '',
+      d.isDrain ? '<span class="b-badge drain" style="background:#4a1259;color:#f3d7ff">🩸 DRAIN</span>' : ''
     ].filter(Boolean).join(' ');
 
-    return `<span class="b-arrow">→</span>
+    return `<div class="b-sub-outcome">
+      <span class="b-tree-branch">↳</span>
+      <span class="b-arrow">→</span>
       <span class="b-target ${targetClass}">${esc(d.targetName || 'Target')}</span>
       <span class="b-outcome damage" title="Exact: ${exact}">−${abbrNum(d.amount)} <small>${esc(d.damageType || 'dmg')}</small></span>
-      ${badges}`;
-  }).join(' ');
+      ${badges}
+    </div>`;
+  }).join('');
 
   const healsHtml = (row.heals || []).map(h => {
-    return `<span class="b-outcome heal" title="Recovered ${h.amount} HP">+${abbrNum(h.amount)} HP</span>`;
-  }).join(' ');
+    return `<div class="b-sub-outcome">
+      <span class="b-tree-branch">↳</span>
+      <span class="b-outcome heal" title="Recovered ${h.amount} HP">+${abbrNum(h.amount)} HP</span>
+    </div>`;
+  }).join('');
 
   const shieldsHtml = (row.shields || []).map(s => {
-    return `<span class="b-outcome shield" title="Gained ${s.amount} shield">🛡️ +${abbrNum(s.amount)}</span>`;
-  }).join(' ');
+    return `<div class="b-sub-outcome">
+      <span class="b-tree-branch">↳</span>
+      <span class="b-outcome shield" title="Gained ${s.amount} shield">🛡️ +${abbrNum(s.amount)} Shield</span>
+    </div>`;
+  }).join('');
 
   const detailsHtml = showDetails && (row.costSP !== undefined || row.cooldown !== undefined)
     ? `<span class="b-details-info">[Cost: ${row.costSP || 0} SP | ${row.cooldown || 0} CD]</span>`
@@ -186,13 +197,15 @@ function renderTurnRowHtml(row, showDetails) {
     ? row.deaths.map(d => `<div class="b-sublines"><span class="b-subline" style="color:#ff8b8b;font-weight:600">💀 ${esc(d.targetName)} falls.</span></div>`).join('')
     : '';
 
+  const hasOutcomes = !!(damagesHtml || healsHtml || shieldsHtml);
+
   return `<div class="b-row ${actorClass}-turn">
-    <span class="b-actor ${actorClass}">${esc(row.actorName)}</span>
-    <span class="b-ability">· ${esc(row.ability)}</span>
-    ${damagesHtml}
-    ${healsHtml}
-    ${shieldsHtml}
-    ${detailsHtml}
+    <div class="b-turn-header">
+      <span class="b-actor ${actorClass}">${esc(row.actorName)}</span>
+      <span class="b-ability">· ${esc(row.ability)}</span>
+      ${detailsHtml}
+    </div>
+    ${hasOutcomes ? `<div class="b-outcomes-block">${damagesHtml}${healsHtml}${shieldsHtml}</div>` : ''}
     ${sublinesHtml}
     ${deathsHtml}
   </div>`;
