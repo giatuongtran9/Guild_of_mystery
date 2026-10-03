@@ -151,7 +151,7 @@
         "effects": [
           {
             "type": "next_attack_miss",
-            "chance": 1.0
+            "chance": 1
           }
         ]
       }
@@ -191,7 +191,7 @@
         "label": "Active",
         "spCost": 65,
         "cooldown": 4,
-        "description": "Chaos Field — Creates disorder zone causing 30% enemy skill misfire chance.",
+        "description": "Chaos Field — Creates disorder zone causing 30% skill misfire chance for all enemies.",
         "stat": "INT",
         "scale": 0,
         "damageType": "physical",
@@ -200,7 +200,8 @@
         "effects": [
           {
             "type": "skill_misfire",
-            "chance": 0.3
+            "chance": 0.3,
+            "duration": 2
           }
         ]
       }
