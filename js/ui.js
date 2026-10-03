@@ -1,7 +1,230 @@
+
+function flattenTurnRows(groupedRounds) {
+  const flattened = [];
+  for (const gr of groupedRounds) {
+    flattened.push({ isRoundHeader: true, round: gr.round, initiative: gr.initiative });
+    for (const row of gr.rows) {
+      flattened.push(row);
+    }
+  }
+  return flattened;
+}
+
+function calculateCurrentHp(initialAllies, initialEnemies, shownRows) {
+  const hpMap = {};
+  for (const a of (initialAllies || [])) hpMap[a.id || a.name] = { ...a, curHp: a.maxHp, maxHp: a.maxHp };
+  for (const e of (initialEnemies || [])) hpMap[e.id || e.name] = { ...e, curHp: e.maxHp, maxHp: e.maxHp };
+
+  for (const row of shownRows) {
+    if (row.damages) {
+      for (const d of row.damages) {
+        const key = d.targetId || d.targetName;
+        if (hpMap[key]) {
+          if (d.hpAfter !== undefined) hpMap[key].curHp = d.hpAfter;
+          else hpMap[key].curHp = Math.max(0, hpMap[key].curHp - (d.amount || 0));
+        }
+      }
+    }
+    if (row.heals) {
+      for (const h of row.heals) {
+        const key = h.targetId || h.targetName;
+        if (hpMap[key]) {
+          if (h.hpAfter !== undefined) hpMap[key].curHp = h.hpAfter;
+          else hpMap[key].curHp = Math.min(hpMap[key].maxHp, hpMap[key].curHp + (h.amount || 0));
+        }
+      }
+    }
+    if (row.deaths) {
+      for (const d of row.deaths) {
+        const key = d.targetId || d.targetName;
+        if (hpMap[key]) hpMap[key].curHp = 0;
+      }
+    }
+    if (row.type === 'death' && row.targetName) {
+      const key = row.targetId || row.targetName;
+      if (hpMap[key]) hpMap[key].curHp = 0;
+    }
+  }
+  return hpMap;
+}
+
+function renderHpStrip(hpMap, allies, enemies) {
+  function card(u, team) {
+    const data = hpMap[u.id || u.name] || { curHp: u.hp || u.maxHp, maxHp: u.maxHp };
+    const cur = Math.max(0, data.curHp);
+    const max = Math.max(1, data.maxHp);
+    const pct = Math.min(100, Math.round((cur / max) * 100));
+    const dead = cur <= 0;
+    return `<div class="hp-card ${team} ${dead ? 'dead' : ''}" title="${esc(u.name)}: ${cur.toLocaleString()} / ${max.toLocaleString()} HP">
+      <div class="hp-card-meta">
+        <span class="name ${team}">${esc(u.name)}</span>
+        <span class="val">${abbrNum(cur)} / ${abbrNum(max)}</span>
+      </div>
+      <div class="hp-bar-bg">
+        <div class="hp-bar-fill ${team}" style="width: ${pct}%"></div>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="battle-hp-strip" aria-label="Current Unit HP">
+    <div class="hp-team allies">${(allies || []).map(a => card(a, 'ally')).join('')}</div>
+    <div class="hp-divider">VS</div>
+    <div class="hp-team enemies">${(enemies || []).map(e => card(e, 'enemy')).join('')}</div>
+  </div>`;
+}
+
+function renderTurnRowHtml(row, showDetails) {
+  if (row.isRoundHeader) {
+    return `<div class="battle-round-title">
+      <span class="round-badge">── Round ${row.round} ──</span>
+      ${showDetails && row.initiative ? `<span class="round-init">Init: ${esc(row.initiative)}</span>` : ''}
+    </div>`;
+  }
+
+  if (row.isSkip) {
+    return `<div class="b-row skip-row ${row.actorTeam}-turn">
+      <span class="b-actor ${row.actorTeam}">${esc(row.actorName)}</span>
+      <span class="muted">${esc(row.text || 'loses action to status')}</span>
+    </div>`;
+  }
+
+  if (row.isMiss) {
+    return `<div class="b-row ${row.actorTeam}-turn">
+      <span class="b-actor ${row.actorTeam}">${esc(row.actorName)}</span>
+      <span class="b-arrow">→</span>
+      <span class="b-target ${row.targetTeam || 'enemy'}">${esc(row.targetName || 'Enemy')}</span>
+      <span class="b-outcome miss">💨 ${esc(row.text || 'Missed')}</span>
+    </div>`;
+  }
+
+  if (row.type === 'thread' || row.type === 'status') {
+    const isTh = row.type === 'thread';
+    return `<div class="b-row ${isTh ? 'b-subline thread' : 'b-subline status'}">
+      <span>${isTh ? '🧵' : '⏳'} ${esc(row.text)}</span>
+    </div>`;
+  }
+
+  if (row.type === 'death') {
+    return `<div class="b-row death-row">
+      <span>💀 <b>${esc(row.targetName || 'Unit')}</b> falls.</span>
+    </div>`;
+  }
+
+  if (row.type === 'story' || row.type === 'system') {
+    return `<div class="b-row" style="color:var(--muted);font-style:italic">
+      <span>${esc(row.text)}</span>
+    </div>`;
+  }
+
+  if (row.type === 'result') {
+    return `<div class="b-row" style="font-weight:bold;color:${row.success ? 'var(--green)' : 'var(--red)'}">
+      <span>${esc(row.text)}</span>
+    </div>`;
+  }
+
+  // Merged action row
+  const actorClass = row.actorTeam || 'ally';
+  const damagesHtml = (row.damages || []).map(d => {
+    const targetClass = d.targetTeam || (actorClass === 'ally' ? 'enemy' : 'ally');
+    const exact = Number(d.amount || 0).toLocaleString();
+    const badges = [
+      d.critical ? '<span class="b-badge crit" title="Critical Hit">💥 CRIT</span>' : '',
+      d.trueDamage ? '<span class="b-badge true-dmg" title="True Damage">⚡ TRUE</span>' : '',
+      d.instantKill ? '<span class="b-badge execute" title="Execute">☠️ EXECUTE</span>' : ''
+    ].filter(Boolean).join(' ');
+
+    return `<span class="b-arrow">→</span>
+      <span class="b-target ${targetClass}">${esc(d.targetName || 'Target')}</span>
+      <span class="b-outcome damage" title="Exact: ${exact}">−${abbrNum(d.amount)} <small>${esc(d.damageType || 'dmg')}</small></span>
+      ${badges}`;
+  }).join(' ');
+
+  const healsHtml = (row.heals || []).map(h => {
+    return `<span class="b-outcome heal" title="Recovered ${h.amount} HP">+${abbrNum(h.amount)} HP</span>`;
+  }).join(' ');
+
+  const shieldsHtml = (row.shields || []).map(s => {
+    return `<span class="b-outcome shield" title="Gained ${s.amount} shield">🛡️ +${abbrNum(s.amount)}</span>`;
+  }).join(' ');
+
+  const detailsHtml = showDetails && (row.costSP !== undefined || row.cooldown !== undefined)
+    ? `<span class="b-details-info">[Cost: ${row.costSP || 0} SP | ${row.cooldown || 0} CD]</span>`
+    : '';
+
+  const sublinesHtml = (row.subrows && row.subrows.length)
+    ? `<div class="b-sublines">${row.subrows.map(s => `<span class="b-subline ${s.type==='thread'?'thread':'status'}">${s.type==='thread'?'🧵':'•'} ${esc(s.text)}</span>`).join('')}</div>`
+    : '';
+
+  const deathsHtml = (row.deaths && row.deaths.length)
+    ? row.deaths.map(d => `<div class="b-sublines"><span class="b-subline" style="color:#ff8b8b;font-weight:600">💀 ${esc(d.targetName)} falls.</span></div>`).join('')
+    : '';
+
+  return `<div class="b-row ${actorClass}-turn">
+    <span class="b-actor ${actorClass}">${esc(row.actorName)}</span>
+    <span class="b-ability">· ${esc(row.ability)}</span>
+    ${damagesHtml}
+    ${healsHtml}
+    ${shieldsHtml}
+    ${detailsHtml}
+    ${sublinesHtml}
+    ${deathsHtml}
+  </div>`;
+}
+
+function renderBattleLogComponent({
+  allies,
+  enemies,
+  flattenedRows,
+  shownCount,
+  isDone,
+  showDetails,
+  speed,
+  summaryText,
+  isSim,
+  onScrollHandler
+}) {
+  const visible = flattenedRows.slice(0, shownCount);
+  const hpMap = calculateCurrentHp(allies, enemies, visible);
+
+  let contentHtml = '';
+  if (visible.length > 70) {
+    const older = visible.slice(0, visible.length - 40);
+    const recent = visible.slice(visible.length - 40);
+    contentHtml = `<details class="collapsed-rounds"><summary>Previous turns (${older.length} events) — click to expand</summary>${older.map(r => renderTurnRowHtml(r, showDetails)).join('')}</details>${recent.map(r => renderTurnRowHtml(r, showDetails)).join('')}`;
+  } else {
+    contentHtml = visible.map(r => renderTurnRowHtml(r, showDetails)).join('');
+  }
+
+  return `<div class="battle-log-wrap" role="log" aria-live="polite">
+    ${renderHpStrip(hpMap, allies, enemies)}
+    <div class="battle-ticker-viewport" id="${isSim ? 'sim-viewport' : 'battle-viewport'}" onscroll="${onScrollHandler}">
+      ${contentHtml}
+      ${!isDone ? '<div class="typing" style="padding:6px 8px;font-style:italic;color:var(--muted)">Battling…</div>' : ''}
+    </div>
+    ${isDone && summaryText ? `<div class="b-result-box ${summaryText.includes('defeated') || summaryText.includes('Team A') ? 'victory' : 'failure'}">
+      <h4>Encounter Summary</h4>
+      <p>${esc(summaryText)}</p>
+    </div>` : ''}
+    <div class="battle-toolbar">
+      <div class="speed-controls">
+        <button type="button" class="${speed===1?'active':''}" onclick="window.G9.setTickerSpeed(1)">1x</button>
+        <button type="button" class="${speed===2?'active':''}" onclick="window.G9.setTickerSpeed(2)">2x</button>
+        <button type="button" class="${speed===4?'active':''}" onclick="window.G9.setTickerSpeed(4)">4x</button>
+        ${!isDone ? `<button type="button" onclick="window.G9.skipTicker()">Skip</button>` : ''}
+      </div>
+      <div>
+        <button type="button" class="${showDetails?'active':''}" onclick="${isSim ? 'window.G9.toggleSimDetails()' : 'window.G9.toggleDetails()'}">
+          ${showDetails ? 'Hide Details' : 'Show Details'}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
 // ===== Browser UI =====
 if (typeof document !== 'undefined') (() => {
   'use strict';
-  let state=loadGame()||newGame(), tab='hall', selected=null, previewPath=PATH_KEYS[0], planning=null, run=null, notice='', tickerTimer=null, simMode='1v1', simA=[{path:PATH_KEYS[0],sequence:9},{path:PATH_KEYS[0],sequence:9}], simB=[{path:PATH_KEYS[1]||PATH_KEYS[0],sequence:9},{path:PATH_KEYS[1]||PATH_KEYS[0],sequence:9}], simResult=null;
+  let state=loadGame()||newGame(), tab='hall', selected=null, previewPath=PATH_KEYS[0], planning=null, run=null, notice='', tickerTimer=null, tickerSpeed=1, showBattleDetails=false, simBattleDetails=false, userScrolledUp=false, simMode='1v1', simA=[{path:PATH_KEYS[0],sequence:9},{path:PATH_KEYS[0],sequence:9}], simB=[{path:PATH_KEYS[1]||PATH_KEYS[0],sequence:9},{path:PATH_KEYS[1]||PATH_KEYS[0],sequence:9}], simResult=null;
   const app=document.getElementById('app');
   const clone=v=>JSON.parse(JSON.stringify(v));
   const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -18,7 +241,18 @@ if (typeof document !== 'undefined') (() => {
     <nav class="tabs">${[['hall','Guild Hall'],['preview','Pathways'],['simulator','Battle Simulator'],['recruit','Recruitment'],['quests','Contracts'],['wanted','Wanted'],['inventory','Inventory'],['chronicle','Chronicle']].map(([id,label])=>`<button class="${tab===id?'active':''}" onclick="window.G9.tab('${id}')">${label}</button>`).join('')}</nav>
     <main>${tab==='hall'?hall():tab==='preview'?pathwayPreview():tab==='simulator'?battleSimulator():tab==='recruit'?recruit():tab==='quests'?quests():tab==='wanted'?wanted():tab==='inventory'?inventory():chronicleView()}</main>
     ${selected?dossier():''}${planning?assignmentModal():''}${run?runModal():''}${notice?`<div class="toast">${esc(notice)}</div>`:''}`;
-    if(run && run.currentLine < run.result.lines.length && !tickerTimer){tickerTimer=setTimeout(()=>{run.currentLine++;tickerTimer=null;render()},850)}
+    if(run && run.currentTurn < (run.turnRows||[]).length && !tickerTimer){
+      const delay = tickerSpeed === 4 ? 100 : (tickerSpeed === 2 ? 250 : 500);
+      tickerTimer = setTimeout(() => {
+        run.currentTurn++;
+        tickerTimer = null;
+        render();
+        if (!userScrolledUp) {
+          const vp = document.getElementById('battle-viewport');
+          if (vp) vp.scrollTop = vp.scrollHeight;
+        }
+      }, delay);
+    }
   }
   function pathwayPreview(){
     const p=pathOf(previewPath)||pathOf(PATH_KEYS[0]);
@@ -45,7 +279,21 @@ if (typeof document !== 'undefined') (() => {
   function battleSimulator(){
     const count=simMode==='1v1'?1:2;
     const side=(arr,label)=>`<div class="sim-side"><h3>${label}</h3>${arr.slice(0,count).map((x,i)=>`<div class="sim-unit"><label>${label} ${i+1} Pathway<select onchange="window.G9.simSet('${label==='Team A'?'A':'B'}',${i},'path',this.value)">${PATH_KEYS.map(k=>`<option value="${k}" ${x.path===k?'selected':''}>${esc(pathOf(k).name)}</option>`).join('')}</select></label><label>Sequence<select onchange="window.G9.simSet('${label==='Team A'?'A':'B'}',${i},'sequence',Number(this.value))">${Array.from({length:10},(_,j)=>9-j).map(n=>`<option value="${n}" ${x.sequence===n?'selected':''}>Sequence ${n}</option>`).join('')}</select></label></div>`).join('')}</div>`;
-    return `<section class="panel battle-simulator"><div class="section-head"><div><h2>Battle Simulator</h2><p>Run a deterministic preview battle between any Pathway and Sequence combination.</p></div><div><button class="${simMode==='1v1'?'active':''}" onclick="window.G9.simMode('1v1')">1v1</button><button class="${simMode==='2v2'?'active':''}" onclick="window.G9.simMode('2v2')">2v2</button></div></div><div class="sim-grid">${side(simA,'Team A')}${side(simB,'Team B')}</div><div class="sim-actions"><button class="primary" onclick="window.G9.runSimulation()">Simulate Battle</button><button onclick="window.G9.clearSimulation()">Clear Log</button></div>${simResult?`<div class="sim-result"><div class="section-head"><h3>${simResult.success?'Team A Victory':'Team B Victory / Draw'}</h3><span>${simResult.rounds} rounds · ${simResult.balanceTrace.length} damage events</span></div><div class="sim-hp"><div><b>Team A</b> ${simResult.teamA.filter(x=>x.alive).length}/${simResult.teamA.length} standing</div><div><b>Team B</b> ${simResult.teamB.filter(x=>x.alive).length}/${simResult.teamB.length} standing</div></div><div class="balance-panel"><div class="section-head"><div><h3>Damage Breakdown</h3><p>Every hit: ability multiplier → raw damage → resistance → DEF → final damage, including effect contributions.</p></div></div><div class="balance-table-wrap"><table class="balance-table"><thead><tr><th>Rnd</th><th>Attacker</th><th>Ability</th><th>Stat</th><th>Mult.</th><th>Raw</th><th>Resist.</th><th>After Resist.</th><th>DEF</th><th>DEF Reduction</th><th>Effects</th><th>Final</th></tr></thead><tbody>${simResult.balanceTrace.map(t=>`<tr><td>${t.round}</td><td>${esc(t.attacker)}</td><td><b>${esc(t.ability)}</b><small>${esc(t.damageType)}${t.critical?' · CRIT':''}</small></td><td>${esc(t.stat)}</td><td>${(Number(t.abilityMultiplier||0)*100).toFixed(0)}%${t.effectiveMultiplier!==t.abilityMultiplier?`<small>eff ${(Number(t.effectiveMultiplier||0)*100).toFixed(0)}%</small>`:''}</td><td>${Math.round(t.raw||0)}</td><td>${Number(t.resistance||0).toFixed(1)}%</td><td>${Math.round(t.afterResistance||0)}</td><td>${Math.round(t.defense||0)}</td><td>${Math.round(t.defenseReduction||0)}</td><td>${t.effectContributions?.length?t.effectContributions.map(e=>`${esc(e.type)}${e.multiplier!=null?` ×${Number(e.multiplier).toFixed(2)}`:''}`).join('<br>'):'—'}</td><td><b>${Math.round(t.final||0)}</b></td></tr>`).join('')}</tbody></table></div></div><details class="sim-raw-log"><summary>Combat Log</summary><div class="sim-log">${simResult.lines.map(l=>`<p class="${esc(l.kind||'normal')}">${esc(l.text)}</p>`).join('')}</div></details></div>`:'<p class="muted">Choose both sides and press Simulate Battle. No guild resources or roster characters are changed.</p>'}</section>`;
+    return `<section class="panel battle-simulator"><div class="section-head"><div><h2>Battle Simulator</h2><p>Run a deterministic preview battle between any Pathway and Sequence combination.</p></div><div><button class="${simMode==='1v1'?'active':''}" onclick="window.G9.simMode('1v1')">1v1</button><button class="${simMode==='2v2'?'active':''}" onclick="window.G9.simMode('2v2')">2v2</button></div></div><div class="sim-grid">${side(simA,'Team A')}${side(simB,'Team B')}</div><div class="sim-actions"><button class="primary" onclick="window.G9.runSimulation()">Simulate Battle</button><button onclick="window.G9.clearSimulation()">Clear Log</button></div>${simResult?`<div class="sim-result"><div class="section-head"><h3>${simResult.success?'Team A Victory':'Team B Victory / Draw'}</h3><span>${simResult.rounds} rounds · ${simResult.balanceTrace.length} damage events</span></div><div class="sim-hp"><div><b>Team A</b> ${simResult.teamA.filter(x=>x.alive).length}/${simResult.teamA.length} standing</div><div><b>Team B</b> ${simResult.teamB.filter(x=>x.alive).length}/${simResult.teamB.length} standing</div></div><div class="balance-panel"><div class="section-head"><div><h3>Damage Breakdown</h3><p>Every hit: ability multiplier → raw damage → resistance → DEF → final damage, including effect contributions.</p></div></div><div class="balance-table-wrap"><table class="balance-table"><thead><tr><th>Rnd</th><th>Attacker</th><th>Ability</th><th>Stat</th><th>Mult.</th><th>Raw</th><th>Resist.</th><th>After Resist.</th><th>DEF</th><th>DEF Reduction</th><th>Effects</th><th>Final</th></tr></thead><tbody>${simResult.balanceTrace.map(t=>`<tr><td>${t.round}</td><td>${esc(t.attacker)}</td><td><b>${esc(t.ability)}</b><small>${esc(t.damageType)}${t.critical?' · CRIT':''}</small></td><td>${esc(t.stat)}</td><td>${(Number(t.abilityMultiplier||0)*100).toFixed(0)}%${t.effectiveMultiplier!==t.abilityMultiplier?`<small>eff ${(Number(t.effectiveMultiplier||0)*100).toFixed(0)}%</small>`:''}</td><td>${Math.round(t.raw||0)}</td><td>${Number(t.resistance||0).toFixed(1)}%</td><td>${Math.round(t.afterResistance||0)}</td><td>${Math.round(t.defense||0)}</td><td>${Math.round(t.defenseReduction||0)}</td><td>${t.effectContributions?.length?t.effectContributions.map(e=>`${esc(e.type)}${e.multiplier!=null?` ×${Number(e.multiplier).toFixed(2)}`:''}`).join('<br>'):'—'}</td><td><b>${Math.round(t.final||0)}</b></td></tr>`).join('')}</tbody></table></div></div><div class="sim-battle-log-wrap" style="margin-top:16px">
+  <div class="section-head"><div><h3>Combat Log</h3><p>Unified turn-by-turn combat view.</p></div></div>
+  ${renderBattleLogComponent({
+    allies: simResult.teamA,
+    enemies: simResult.teamB,
+    flattenedRows: simResult.turnRows,
+    shownCount: simResult.turnRows.length,
+    isDone: true,
+    showDetails: simBattleDetails,
+    speed: 1,
+    summaryText: simResult.summaryText,
+    isSim: true,
+    onScrollHandler: ''
+  })}
+</div></div>`:'<p class="muted">Choose both sides and press Simulate Battle. No guild resources or roster characters are changed.</p>'}</section>`;
   }
   function hall(){return `<section class="grid two"><div class="panel"><div class="section-head"><div><h2>Guild Roster</h2><p>Every character begins as an ordinary person.</p></div><span>${combatReady().length} combat-ready</span></div>${state.roster.map(agentCard).join('')||'<div class="empty"><h3>The roster is empty.</h3><p>Visit the Recruitment Office to hire your first ordinary person.</p></div>'}</div><div class="panel"><div class="section-head"><h2>Guild Ledger</h2><button class="small" onclick="window.G9.reset()">Reset</button></div><div class="ledger"><p><b>Reputation</b></p><p>${state.reputation} — measures the guild's standing. Higher reputation unlocks more contracts, higher rewards and more dangerous supernatural work.</p><p><b>Digesting</b></p><p>Successful quests advance a character's understanding of their current potion. Individual contracts digest faster than team contracts.</p><p><b>Permanent loss</b></p><p>Death and failed advancement remove the character from the roster.</p></div></div></section>`}
   function statusBar(label,value){return `<div class="meter"><div><span>${label}</span><b>${Math.round(value||0)}/100</b></div><i><em style="width:${Math.min(100,Math.max(0,value||0))}%"></em></i></div>`}
@@ -74,9 +322,36 @@ function equipmentPicker(a){const options=Object.values(WEAPONS).filter(w=>w.id=
     return `<div class="overlay" onclick="window.G9.closeDossier()"><div class="modal" onclick="event.stopPropagation()"><button class="close" onclick="window.G9.closeDossier()">×</button><div class="eyebrow">CHARACTER DOSSIER</div><h2>${esc(a.name)}</h2><p>${esc(a.occupation||'Ordinary person')} · ${a.awakened?esc(pathName(a.path))+' · Sequence '+a.sequence+' · '+esc(tier.name):'Unawakened'}</p><div class="intro"><h3>Introduction</h3><p>${esc(intro)}</p></div><div class="big-stats">${[['HP',eff.hp],['ATK',eff.atk],['DEF',eff.def],['INT',eff.int]].map(x=>`<div><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}</div>${statusBar('Madness',a.madness)}${statusBar('Corruption',a.corruption)}${statusBar('Injuries',a.injuries)}${a.awakened?`<div class="combat-rates"><b>Combat Rates</b>${(()=>{const cr=combatRates(a);return `<span>Crit ${Math.round(cr.crit*100)}%</span><span>Crit Damage +${Math.round(cr.critDamage*100)}%</span><span>Dodge ${Math.round(cr.dodge*100)}%</span><span>Counter ${Math.round(cr.counter*100)}%</span><span>Speed ${cr.speed.toFixed(1)} · AV ${cr.av.toFixed(1)}</span><span>Archetype ${archetypeOf(a.path)}</span><span>Max SP ${maxSPFor(a)}</span><span>Element Resistance: ${Object.entries(cr.resistances||{}).map(([k,v])=>`${esc(k)} ${v>0?'+':''}${Math.round(v)}%`).join(' · ')||'None'}</span>${cr.passives&&cr.passives.length?`<span>Passives: ${cr.passives.map(esc).join(' · ')}</span>`:''}`;})()}<span>Weapon Mastery: Gun ${weaponMasteryValue(a,'gun')} · Melee ${weaponMasteryValue(a,'weapon')} · Bare Hand ${weaponMasteryValue(a,'unarmed')}</span></div>${statusBar('Digesting',a.digest)}<div class="special-meter"><b>${esc(specialStatFor(a.path,a.sequence,a).name)} ${Math.round(specialStatFor(a.path,a.sequence,a).value)}/100</b><small>Gain: ${esc(specialStatFor(a.path,a.sequence,a).gain)} · Spend: ${esc(specialStatFor(a.path,a.sequence,a).spend)}</small></div>`:`<h3>Awakening — Sequence 9</h3><p>This character is an ordinary human. Sequence 9 begins their supernatural pathway; it is not an ordinary-human tier. Choose the Pathway whose nature best fits their characteristics.</p><div class="path-grid">${pathButtons}</div>`}<h3>Equipment</h3><div class="equipment-card"><b>${esc(weaponFor(a).name)}</b><span>Weapon ATK: +${weaponFor(a).atk}</span><span>Current ATK: <strong>${combatDisplayStats(a).atk}</strong> <small>(${a.stats.atk})</small></span><span>${weaponFor(a).kind==='gun'?`Gun Accuracy: ${Math.round((1-weaponStats(a).masteryMiss)*100)}% · Gun Mastery Lv.${weaponStats(a).mastery}`:`${weaponFor(a).kind==='unarmed'?'Bare Hand':'Melee'} Mastery Lv.${weaponStats(a).mastery}`}</span><span>Mastery is permanently attached to this character; changing weapons does not reset it.</span>${weaponFor(a).bleed?`<span>Bleed: ${Math.round(weaponFor(a).bleed*100)}% if target survives</span>`:''}${equipmentPicker(a)}</div><h3>Sequence abilities</h3><div class="ability-list">${abilities||'<p class="muted">No Beyonder abilities yet. Awaken to Sequence 9.</p>'}</div>${next?`<h3>Advancement</h3><p>Next: <b>Sequence ${a.sequence-1} — ${esc(next.next.name)}</b>. Digesting: ${Math.round(a.digest||0)}%.</p><div class="requirement-box"><b>Requirements</b><span>Digesting: ${next.ready?'Complete':'Not complete'}</span><span>${esc(next.mat)}: ${state.materials[next.mat]||0}/${next.materialCost}</span><span>Funds: £${state.funds.toLocaleString()}/£${next.fundsCost}</span></div><button class="primary full" onclick="window.G9.advance('${a.id}')">Review Advancement</button>`:''}${a.awakened&&a.sequence===0?'<p class="gold-note">Sequence 0 — Deity. No further advancement.</p>':''}<h3>Combat Trait</h3><p><b>${esc(a.trait||'Stout Vitality')}</b> — ${esc((TRAITS[a.trait||'Stout Vitality']||TRAITS['Stout Vitality']).desc)}</p><p class="muted">Each stat has an individual variance roll of ±10% at awakening. Variance is shown below and remains fixed for this character.</p><h3>History</h3>${(a.history||[]).slice().reverse().map(h=>`<p class="history"><small>Day ${h.day}</small> ${esc(h.text)}</p>`).join('')}</div></div>`;
   }
   function assignmentModal(){const q=planning;const ready=combatReady();const saved=state.teams[q.id]||[];return `<div class="overlay"><div class="modal"><button class="close" onclick="window.G9.cancelPlan()">×</button><div class="eyebrow">CONTRACT ASSIGNMENT</div><h2>${esc(q.name)}</h2><p>${esc(q.story||q.brief)}</p><p><b>Threat:</b> Sequence ${q.difficultySequence} · <b>Reward:</b> £${q.rewards.funds}</p><h3>Assign characters</h3><div class="assign-list">${ready.length?ready.map(a=>`<button type="button" class="assign-row ${window.G9.selectedIds.includes(a.id)?'selected':''}" onclick="window.G9.toggleAssign('${a.id}')"><span class="assign-check">${window.G9.selectedIds.includes(a.id)?'✓':'○'}</span><span><b>${esc(a.name)}</b> · ${esc(pathName(a.path))} Seq ${a.sequence}<small>Digest ${a.digest||0}% · HP ${a.stats.hp} · Weapon: ${esc(weaponFor(a).name)}</small></span><select onclick="event.stopPropagation()" onchange="window.G9.setWeapon('${a.id}',this.value)">${Object.values(WEAPONS).filter(w=>w.id==='none'||w.id===a.weaponId||(state.weapons[w.id]||0)>0).map(w=>`<option value="${w.id}" ${a.weaponId===w.id?'selected':''}>${esc(w.name)} (${state.weapons[w.id]||0})</option>`).join('')}</select></button>`).join(''):'<p class="muted">No awakened characters are available. Recruit and awaken someone first.</p>'}</div><div class="assign-actions"><button onclick="window.G9.saveTeam()">Save Selected Team</button><button onclick="window.G9.clearSelection()">Clear</button></div><button class="primary full" onclick="window.G9.launch()">Begin Contract</button></div></div>`}
-  function runModal(){const shown=(run.result.lines||[]).slice(0,run.currentLine);const done=run.currentLine>=run.result.lines.length;const q=run.quest;const wanted=q.target||q.name?.startsWith('Wanted');return `<div class="overlay"><div class="modal quest-modal"><div class="eyebrow">${wanted?'WANTED HUNT':'CONTRACT RESOLUTION'}</div><h2>${esc(q.target||q.name)}</h2>${wanted?`<div class="wanted-meta"><span><b>Known Path:</b> ${esc(q.knownPath||'Unknown')}</span><span><b>Threat:</b> ${esc(q.threat||'★★★☆☆')}</span><span><b>Last Seen:</b> ${esc(q.lastSeen||'Unknown')}</span></div><blockquote>${esc(q.story||q.brief)}</blockquote><h4>Objective</h4><p class="wanted-code">${esc(q.objectiveText||'Capture or kill the target')}</p><h4>Reward</h4><p class="wanted-code">£${q.rewards?.funds||0}<br>+ ${q.rewards?.reputation||0} Reputation</p>`:''}<div class="ticker">${shown.map(l=>`<p class="${l.kind}">${esc(l.text)}</p>`).join('')}${!done?'<p class="typing">…</p>':''}</div><div class="ticker-controls">${!done?`<button onclick="window.G9.fastTicker()">Fast-forward</button><button onclick="window.G9.skipTicker()">Skip</button>`:''}</div>${done?`<div class="result ${run.result.success?'success':'failure'}">${run.result.success?(wanted?'TARGET ELIMINATED':'CONTRACT FULFILLED'):(wanted?'HUNT FAILED':'CONTRACT FAILED')}</div><button class="primary full" onclick="window.G9.closeQuest()">Return to Guild</button>`:''}</div></div>`}
+  function runModal(){
+    const q=run.quest;
+    const wanted=q.target||q.name?.startsWith('Wanted');
+    const isDone = run.currentTurn >= run.turnRows.length;
+    const summary = summarizeBattleEvents(run.result.events||[], run.result.battleSnapshot);
+    const logHtml = renderBattleLogComponent({
+      allies: run.initialAllies,
+      enemies: run.initialEnemies,
+      flattenedRows: run.turnRows,
+      shownCount: run.currentTurn,
+      isDone,
+      showDetails: showBattleDetails,
+      speed: tickerSpeed,
+      summaryText: summary.summaryText,
+      isSim: false,
+      onScrollHandler: 'window.G9.onTickerScroll(this)'
+    });
+
+    return `<div class="overlay"><div class="modal quest-modal">
+      <div class="eyebrow">${wanted?'WANTED HUNT':'CONTRACT RESOLUTION'}</div>
+      <h2>${esc(q.target||q.name)}</h2>
+      ${wanted?`<div class="wanted-meta"><span><b>Known Path:</b> ${esc(q.knownPath||'Unknown')}</span><span><b>Threat:</b> ${esc(q.threat||'★★★☆☆')}</span><span><b>Last Seen:</b> ${esc(q.lastSeen||'Unknown')}</span></div><blockquote>${esc(q.story||q.brief)}</blockquote><h4>Objective</h4><p class="wanted-code">${esc(q.objectiveText||'Capture or kill the target')}</p><h4>Reward</h4><p class="wanted-code">£${q.rewards?.funds||0}<br>+ ${q.rewards?.reputation||0} Reputation</p>`:''}
+      ${logHtml}
+      ${isDone?`<div class="result ${run.result.success?'success':'failure'}">${run.result.success?(wanted?'TARGET ELIMINATED':'CONTRACT FULFILLED'):(wanted?'HUNT FAILED':'CONTRACT FAILED')}</div><button class="primary full" onclick="window.G9.closeQuest()">Return to Guild</button>`:''}
+    </div></div>`;
+  }
   window.G9={
-    tab:t=>{tab=t;render()},previewPath:path=>{if(PATH_KEYS.includes(path)){previewPath=path;render()}},simMode:m=>{simMode=m;render()},simSet:(team,i,key,value)=>{const arr=team==='A'?simA:simB;if(arr[i])arr[i][key]=value;render()},clearSimulation:()=>{simResult=null;render()},runSimulation:()=>{const seed=Date.now()%2147483647;const count=simMode==='1v1'?1:2;const mk=(x,i)=>{const a=makeAgent(Math.random,{sequence:x.sequence,path:x.path,trait:'Stout Vitality'});a.id=`sim_${i}_${x.path}_${x.sequence}`;a.name=`${pathOf(x.path).name} Seq ${x.sequence}`;a.awakened=true;a.path=x.path;a.sequence=x.sequence;a.recommendedPath=x.path;a.injuries=0;a.weaponId='none';a.weaponMastery={};a.sp=maxSPFor(a);restatAgent(a);return a;};const members=simA.slice(0,count).map((x,i)=>mk(x,i));const opponents=simB.slice(0,count).map((x,i)=>({path:x.path,sequence:x.sequence}));const q={id:'sim',name:`${simMode} Battle`,brief:'Battle Simulator',story:'A controlled simulation. No guild resources are changed.',objective:'combat',difficultySequence:Math.min(...opponents.map(x=>x.sequence)),encounter:true,mundane:false,rewards:{funds:0,reputation:0,materials:{}},enemyCount:count,requiredPath:opponents[0].path};const res=resolveQuest(members,q,seed,{individual:count===1,simulationOpponents:opponents});const snap=res.battleSnapshot||{allies:[],enemies:[]};simResult={success:res.success,rounds:res.lines.filter(x=>/^· Round /.test(x.text)).length,lines:res.lines,teamA:snap.allies,teamB:snap.enemies,balanceTrace:snap.balanceTrace||[]};render()},fastTicker:()=>{if(!run)return;run.currentLine=Math.min(run.result.lines.length,run.currentLine+6);render()},skipTicker:()=>{if(!run)return;run.currentLine=run.result.lines.length;render()},dossier:id=>{selected=id;render()},closeDossier:()=>{selected=null;render()},recruitInfo:id=>{const a=state.recruitPool.find(x=>x.id===id);if(a){toast(`${a.name}: ${a.occupation}. Recommended ${pathName(a.recommendedPath)}.`)}},
+    tab:t=>{tab=t;render()},previewPath:path=>{if(PATH_KEYS.includes(path)){previewPath=path;render()}},simMode:m=>{simMode=m;render()},simSet:(team,i,key,value)=>{const arr=team==='A'?simA:simB;if(arr[i])arr[i][key]=value;render()},clearSimulation:()=>{simResult=null;render()},runSimulation:()=>{const seed=Date.now()%2147483647;const count=simMode==='1v1'?1:2;const mk=(x,i)=>{const a=makeAgent(Math.random,{sequence:x.sequence,path:x.path,trait:'Stout Vitality'});a.id=`sim_${i}_${x.path}_${x.sequence}`;a.name=`${pathOf(x.path).name} Seq ${x.sequence}`;a.awakened=true;a.path=x.path;a.sequence=x.sequence;a.recommendedPath=x.path;a.injuries=0;a.weaponId='none';a.weaponMastery={};a.sp=maxSPFor(a);restatAgent(a);return a;};const members=simA.slice(0,count).map((x,i)=>mk(x,i));const opponents=simB.slice(0,count).map((x,i)=>({path:x.path,sequence:x.sequence}));const q={id:'sim',name:`${simMode} Battle`,brief:'Battle Simulator',story:'A controlled simulation. No guild resources are changed.',objective:'combat',difficultySequence:Math.min(...opponents.map(x=>x.sequence)),encounter:true,mundane:false,rewards:{funds:0,reputation:0,materials:{}},enemyCount:count,requiredPath:opponents[0].path};const res=resolveQuest(members,q,seed,{individual:count===1,simulationOpponents:opponents});const snap=res.battleSnapshot||{allies:[],enemies:[]};const simTurns = flattenTurnRows(groupEventsToRows(res.events||[]));
+    const simSummary = summarizeBattleEvents(res.events||[], snap);
+    simResult={success:res.success,rounds:res.lines.filter(x=>/^· Round /.test(x.text)).length,lines:res.lines,events:res.events||[],turnRows:simTurns,summaryText:simSummary.summaryText,teamA:snap.allies,teamB:snap.enemies,balanceTrace:snap.balanceTrace||[]};render()},fastTicker:()=>{if(!run)return;run.currentTurn=Math.min(run.turnRows.length,run.currentTurn+5);render();},skipTicker:()=>{if(!run)return;run.currentTurn=run.turnRows.length;render();},dossier:id=>{selected=id;render()},closeDossier:()=>{selected=null;render()},recruitInfo:id=>{const a=state.recruitPool.find(x=>x.id===id);if(a){toast(`${a.name}: ${a.occupation}. Recommended ${pathName(a.recommendedPath)}.`)}},
     hire:id=>{const a=state.recruitPool.find(x=>x.id===id);if(!a)return;if(state.funds<150)return toast('Not enough funds.');commit(d=>{d.funds-=150;d.recruitPool=d.recruitPool.filter(x=>x.id!==id);a.history=[{day:d.day,text:`Hired from the Recruitment Office as an ordinary ${a.occupation.toLowerCase()}.`}];d.roster.push(clone(a));chronicle(d,`${a.name} joins the guild as an ordinary ${a.occupation.toLowerCase()}.`);if(!d.recruitPool.length){d.recruitPool=makeRecruitPool(4,Date.now(),d.reputation);d.recruitRefreshDay=d.day+7}})},
     refreshRecruit:()=>{if(state.day<state.recruitRefreshDay)return toast(`The office is not ready to refresh for ${state.recruitRefreshDay-state.day} more day(s).`);commit(d=>{d.recruitPool=makeRecruitPool(4,Date.now(),d.reputation);d.recruitRefreshDay=d.day+7;chronicle(d,'The Recruitment Office refreshes its candidates.')})},
     choosePath:(id,path)=>{const a=state.roster.find(x=>x.id===id);if(!a||a.awakened||!PATH_KEYS.includes(path))return;const cost=1;if((state.materials[pathOf(path).material]||0)<cost)return toast(`You need 1 ${pathOf(path).material} to awaken.`);commit(d=>{const x=d.roster.find(y=>y.id===id);x.path=path;x.sequence=9;x.awakened=true;x.digest=0;x.stats=awakenStats(x,path);x.baseStats={...x.stats};x.maxSP=maxSPFor(x);x.sp=x.maxSP;x.cooldowns={};x.basePathSpeed=basePathSpeed(path);x.humanStats=x.humanStats||{...x.stats};const aw=tierFor(path,9), awA=aw.abilities?.[0]||{};x.abilities=[awA];x.abilityHistory=[{sequence:9,name:aw.name,ability:awA.text||aw.abilityText||aw.ability,type:awA.type||aw.type,effectId:awA.effectId||aw.effectId,damage:awA.damage||null,effects:awA.effects||[],effects:awA.effects||[]}];noteAgent(x,d.day,`Drank the ${pathName(path)} Sequence 9 potion and awakened as Sequence 9 ${tierFor(path,9).name}.`);chronicle(d,`${x.name} awakens as Sequence 9 ${pathName(path)}.`);d.materials[pathOf(path).material]-=cost;d.day+=1;if(d.quests.every(q=>!q.encounter))d.quests.push(makeQuest(()=>.5,9,10,Math.max(5,d.reputation),[path]));})},
@@ -90,8 +365,11 @@ function equipmentPicker(a){const options=Object.values(WEAPONS).filter(w=>w.id=
     clearSelection:()=>{window.G9.selectedIds=[];render()},
     saveTeam:()=>{if(!planning||window.G9.selectedIds.length<1)return toast('Select at least one character.') ;commit(d=>{d.teams[planning.id]=[...window.G9.selectedIds];chronicle(d,`A team was saved for ${planning.name}.`);planning=d.quests.find(q=>q.id===planning.id)});render()},
     cancelPlan:()=>{planning=null;render()},
-    launch:()=>{if(!planning)return;const ids=window.G9.selectedIds||[];if(ids.length<1)return toast('Assign at least one character.');const members=state.roster.filter(a=>ids.includes(a.id)&&a.status==='active'&&a.awakened);if(!members.length)return toast('At least one awakened character is required.');const owners=new Set(members.filter(a=>a.unitType!=='marionette').map(a=>a.id));for(const m of members.filter(a=>a.unitType==='marionette')){if(!owners.has(m.ownerId))return toast('A Marionette can only deploy while its owner is in the party.');const owner=state.roster.find(a=>a.id===m.ownerId);const count=members.filter(a=>a.unitType==='marionette'&&a.ownerId===m.ownerId).length;if(count>threadSlots(owner.sequence))return toast(`The owner can deploy only ${threadSlots(owner.sequence)} Marionette(s) at this Sequence.`);}const q=planning;const individual=members.length===1;const result=resolveQuest(clone(members),q,Date.now()%2147483647,{individual});planning=null;run={quest:q,result,currentLine:0};render()},
-    closeQuest:()=>{if(!run||run.currentLine<run.result.lines.length)return;const q=run.quest,res=run.result;commit(d=>{applyConsequences(d,res.consequences);addMarionettes(d,res);d.funds+=res.rewards.funds;d.reputation+=res.rewards.reputation;for(const[k,v]of Object.entries(res.rewards.materials||{}))d.materials[k]=(d.materials[k]||0)+v;d.quests=d.quests.filter(x=>x.id!==q.id);d.wanted=d.wanted||[];d.wanted=d.wanted.filter(x=>x.id!==q.id);d.day+=res.dayCost||1;chronicle(d,res.success?`${q.name}: contract fulfilled.`:`${q.name}: contract failed.`);if(d.recruitRefreshDay<=d.day){d.recruitPool=makeRecruitPool(4,Date.now(),d.reputation);d.recruitRefreshDay=d.day+7;}const target=questCountForReputation(d.reputation);if(!d.wanted.length&&d.reputation>=15){const w=makeWantedQuest(d.reputation,()=>.99,d.roster.filter(a=>a.awakened).map(a=>a.path));d.wanted.push(w);}if(d.quests.length<target){d.quests.push(...makeQuestBoard(target-d.quests.length,Date.now(),d.reputation,d.roster.filter(a=>a.awakened).map(a=>a.path)));}if(d.roster.some(a=>a.awakened)&&d.quests.every(q=>!q.encounter))d.quests[0]=makeQuest(()=>.5,9,10,Math.max(5,d.reputation),d.roster.filter(a=>a.awakened).map(a=>a.path));});run=null;tab='hall';render()},
+    launch:()=>{if(!planning)return;const ids=window.G9.selectedIds||[];if(ids.length<1)return toast('Assign at least one character.');const members=state.roster.filter(a=>ids.includes(a.id)&&a.status==='active'&&a.awakened);if(!members.length)return toast('At least one awakened character is required.');const owners=new Set(members.filter(a=>a.unitType!=='marionette').map(a=>a.id));for(const m of members.filter(a=>a.unitType==='marionette')){if(!owners.has(m.ownerId))return toast('A Marionette can only deploy while its owner is in the party.');const owner=state.roster.find(a=>a.id===m.ownerId);const count=members.filter(a=>a.unitType==='marionette'&&a.ownerId===m.ownerId).length;if(count>threadSlots(owner.sequence))return toast(`The owner can deploy only ${threadSlots(owner.sequence)} Marionette(s) at this Sequence.`);}const q=planning;const individual=members.length===1;const result=resolveQuest(clone(members),q,Date.now()%2147483647,{individual});planning=null;const initialAllies = clone(members).map(m=>({id:m.id,name:m.name,team:'ally',maxHp:effectiveStats(m).hp,hp:effectiveStats(m).hp}));
+    const initialEnemies = (result.battleSnapshot?.enemies||[]).map(e=>({id:e.id,name:e.name,team:'enemy',maxHp:e.maxHp,hp:e.maxHp}));
+    const turnRows = flattenTurnRows(groupEventsToRows(result.events||[]));
+    run={quest:q,result,initialAllies,initialEnemies,turnRows,currentTurn:0,currentLine:result.lines.length};render()},
+    closeQuest:()=>{if(!run||run.currentTurn<run.turnRows.length)return;const q=run.quest,res=run.result;commit(d=>{applyConsequences(d,res.consequences);addMarionettes(d,res);d.funds+=res.rewards.funds;d.reputation+=res.rewards.reputation;for(const[k,v]of Object.entries(res.rewards.materials||{}))d.materials[k]=(d.materials[k]||0)+v;d.quests=d.quests.filter(x=>x.id!==q.id);d.wanted=d.wanted||[];d.wanted=d.wanted.filter(x=>x.id!==q.id);d.day+=res.dayCost||1;chronicle(d,res.success?`${q.name}: contract fulfilled.`:`${q.name}: contract failed.`);if(d.recruitRefreshDay<=d.day){d.recruitPool=makeRecruitPool(4,Date.now(),d.reputation);d.recruitRefreshDay=d.day+7;}const target=questCountForReputation(d.reputation);if(!d.wanted.length&&d.reputation>=15){const w=makeWantedQuest(d.reputation,()=>.99,d.roster.filter(a=>a.awakened).map(a=>a.path));d.wanted.push(w);}if(d.quests.length<target){d.quests.push(...makeQuestBoard(target-d.quests.length,Date.now(),d.reputation,d.roster.filter(a=>a.awakened).map(a=>a.path)));}if(d.roster.some(a=>a.awakened)&&d.quests.every(q=>!q.encounter))d.quests[0]=makeQuest(()=>.5,9,10,Math.max(5,d.reputation),d.roster.filter(a=>a.awakened).map(a=>a.path));});run=null;tab='hall';render()},
     buyMaterial:(path)=>{const p=pathOf(path);if(!p)return;if(state.funds<180)return toast('Buying a Pathway material requires £180.');commit(d=>{d.funds-=180;d.materials[p.material]=(d.materials[p.material]||0)+1;chronicle(d,`Purchased 1 ${p.material}.`);});},reset:()=>{if(confirm('Erase the current guild and begin again?')){clearSave();state=newGame();state.schema=4;state.recruitRefreshDay=8;window.G9.selectedIds=[];tab='hall';saveGame(state);render()}}
   };
   window.G9.selectedIds=[];
