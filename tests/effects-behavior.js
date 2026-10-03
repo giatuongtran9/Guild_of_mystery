@@ -67,6 +67,8 @@ T.status_chance = () => { const r = cast([{ type: 'status_chance', status: 'stun
 T.sp_drain = () => { const r = cast([{ type: 'sp_drain', amount: 30 }], ({ ub }) => { ub.sp = 100; ub.agent.sp = 100; }); return (r.ub.sp ?? 100) < 100 || r.b.sp < 100; };
 T.sp_cost_increase = () => { const r = cast([{ type: 'sp_cost_increase', amount: .5, duration: 2 }]); return r.ub._spCostMultiplier > 0; };
 T.cooldown_increase = () => { const r = cast([{ type: 'cooldown_increase', amount: 1, duration: 2 }]); return r.ub._cooldownPenalty > 0; };
+T.status_pool = () => { const r = cast([{ type: 'status_pool', statuses: ['freeze', 'burn', 'stunned'], chance: 1, duration: 1 }]); return ['freeze', 'burn', 'stunned'].some(st => g.hasStatus(r.ub, st)); };
+T.no_shield = () => { const r = cast([{ type: 'no_shield', duration: 2 }]); return g.hasStatus(r.ub, 'no_shield'); };
 T.steal_stat = () => { const r = cast([{ type: 'steal_stat', stat: 'def', amount: .2 }, { type: 'steal_stat', stat: 'hp', amount: .1 }], ({ ua }) => { ua.hp = Math.round(ua.maxHp * .5); }); return r.ub._debuffs?.def === .8 && r.ua._buffs?.def === 1.2 && r.a._buffs?.def === 1.2 && r.ub.hp < r.ub.maxHp && r.ua.hp > r.ua.maxHp * .5; };
 T.cleanse = () => { const r = cast([{ type: 'cleanse' }], ({ ua }) => { ua.status = ['stunned']; ua.statusMeta = { stunned: { duration: 2 } }; }); return !g.hasStatus(r.ua, 'stunned'); };
 T.strip_buffs = () => { const r = cast([{ type: 'strip_buffs' }], ({ ub }) => { ub._buffs = { atk: 1.3 }; }); return !r.ub._buffs?.atk; };
