@@ -118,12 +118,19 @@
         "label": "Active",
         "spCost": 35,
         "cooldown": 2,
-        "description": "Spirit Body Door — Opens underworld gate dealing 160% INT Death DMG.",
+        "description": "Spirit Body Door — Opens underworld gate dealing 160% INT Death DMG and inflicts Freeze for 1 round.",
         "stat": "INT",
         "scale": 1.6,
         "damageType": "death",
         "formula": "pure_caster_ability",
-        "tag": null
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "freeze",
+            "duration": 1
+          }
+        ]
       }
     },
     {
@@ -162,13 +169,17 @@
         "label": "Active",
         "spCost": 50,
         "cooldown": 3,
-        "description": "Undying Rebirth Aura — Envelops user in death aura, absorbing 25% Max HP damage and dealing 150% INT Death DMG to adjacent enemies.",
+        "description": "Undying Rebirth Aura — Envelops user in death aura, absorbing 25% Max HP damage and dealing 150% INT Death DMG to all enemies.",
         "stat": "INT",
         "scale": 1.5,
         "damageType": "death",
         "formula": "pure_caster_ability",
         "tag": "Defense",
         "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
           {
             "type": "shield",
             "maxHpRatio": 0.25,
@@ -219,12 +230,19 @@
         "label": "Active",
         "spCost": 85,
         "cooldown": 4,
-        "description": "Pale Emperor Gaze — Gaze of death dealing 280% INT Death DMG.",
+        "description": "Pale Emperor Gaze — Gaze of death dealing 280% INT Death DMG and inflicts Freeze for 3 rounds.",
         "stat": "INT",
         "scale": 2.8,
         "damageType": "death",
         "formula": "pure_caster_ability",
-        "tag": null
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "freeze",
+            "duration": 3
+          }
+        ]
       }
     },
     {
