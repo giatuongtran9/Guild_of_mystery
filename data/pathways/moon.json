@@ -174,8 +174,13 @@
           {
             "type": "targeting",
             "mode": "all_enemies"
+          },
+          {
+            "type": "sp_siphon",
+            "amount": 15
           }
-        ]
+        ],
+        "targeting": "all_enemies"
       }
     },
     {
