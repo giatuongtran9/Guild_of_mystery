@@ -140,7 +140,7 @@ function isThreadBeyonder(agent) {
 
 function hasThreadCC(agentUnit) {
   const statuses = agentUnit?.status || [];
-  return ["stunned", "silenced", "frozen", "bound", "unconscious"].some((x) => statuses.includes(x));
+  return ["stunned", "silenced", "frozen", "polymorphed", "bound", "unconscious"].some((x) => statuses.includes(x));
 }
 
 function releaseThread(agent,enemy){
@@ -355,7 +355,7 @@ function runActiveAbility(agent,actor,enemy,state,lines,r,effectId){
  return false;
 }
 function actionDisabled(unit){
- return ['stunned','frozen','sleep'].some(s=>hasStatus(unit,s)) || hasStatus(unit,'bound') || hasStatus(unit,'unconscious') || (unit._skipTurns > 0) || hasStatus(unit,'banished');
+ return ['stunned','frozen','sleep','polymorphed'].some(s=>hasStatus(unit,s)) || hasStatus(unit,'bound') || hasStatus(unit,'unconscious') || (unit._skipTurns > 0) || hasStatus(unit,'banished');
 }
 function handleSleepWake(target,lines){
  if(hasStatus(target,'sleep')){removeStatus(target,'sleep');lines.push({text:`${target.name} wakes from Sleep when struck.`,kind:'status'});}
@@ -392,7 +392,7 @@ function chooseStructuredAbility(agent,actor,enemy,state){
  const survival=specs.find(x=>x.tag==='Heal'||x.tag==='Defense'||x.tag==='Escape');
  if(hpRatio<.50&&survival)return survival;
  const control=specs.find(x=>abilityEffects(x).some(e=>['status','status_chance','skip','banish','silence'].includes(e.type)));
- if(control&&!(enemy.status||[]).some(s=>['stunned','frozen','sleep','silenced','banished'].includes(s)))return control;
+ if(control&&!(enemy.status||[]).some(s=>['stunned','frozen','sleep','silenced','banished','polymorphed'].includes(s)))return control;
  const damaging=specs.filter(x=>(x.damage?.multiplier||x.scale||0)>0).sort((a,b)=>(b.damage?.multiplier||b.scale||0)-(a.damage?.multiplier||a.scale||0))[0];
  if(damaging)return damaging;
  // Support-only abilities are cast only when they would currently do something (no healing at full HP, no re-shielding, no re-buffing).
@@ -457,6 +457,20 @@ function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
   else if(e.type==='mind_control'){const ally=foesOf(actor,state).find(x=>x!==enemy&&x.alive);if(ally){const dmg=Math.max(1,Math.round((enemy.atk||enemy.agent?.stats?.atk||10)*Number(e.damageMultiplier||1.5)));lines.push({text:`${enemy.name} turns its own power against ${ally.name} for ${dmg} damage.`,kind:'quirk'});resolveIncoming(enemy,ally,dmg,state,lines,r);if(ally.hp<=0){ally.hp=0;ally.alive=false;}}addStatus(enemy,'stunned',1,actor.name);}
   else if(e.type==='reflect'){{const d=fxDuration(e,'reflect');actor._reflect={mode:e.mode==='stat'?'stat':'share',stat:String(e.stat||'INT').toUpperCase(),multiplier:Number(e.multiplier||0),share:Number(e.share||0),element:e.element||'physical',negate:!!e.negate,untilTurn:d==='next_turn',rounds:d==='next_turn'?0:Number(d)};lines.push({text:`${actor.name} is wrapped in a reflecting ward${e.negate?' that negates incoming damage':''} ${d==='next_turn'?'until their next turn':'for '+Number(d)+' rounds'}.`,kind:'status'});}}
   else if(e.type==='taunt'){const d=fxDuration(e,'taunt');if(d==='next_turn')actor._tauntUntilTurn=true;else actor._taunt=Math.max(actor._taunt||0,Number(d));lines.push({text:`${actor.name} taunts the enemy ${d==='next_turn'?'until their next turn':'for '+Number(d)+' rounds'}.`,kind:'status'});}
+  else if(e.type==='sp_siphon'){
+    const drainAmt=Number(e.amount||0);
+    let totalSiphoned=0;
+    for(const t of targets){
+      if(!t.alive)continue;
+      const tAgent=t.agent||t;
+      if(tAgent.sp!==undefined)tAgent.sp=Math.max(0,(tAgent.sp||0)-drainAmt);
+      t.sp=Math.max(0,(t.sp||0)-drainAmt);
+      totalSiphoned+=drainAmt;
+    }
+    agent.sp=Math.min(agent.maxSP||99999,(agent.sp||0)+totalSiphoned);
+    if(actor!==agent&&actor)actor.sp=agent.sp;
+    lines.push({text:`${actor.name} siphons ${totalSiphoned} SP from enemies.`,kind:'status'});
+  }
   else if(e.type==='sp_drain')for(const t of targets)t.sp=Math.max(0,(t.sp||0)-Number(e.amount||0));
   else if(e.type==='sp_cost_increase')for(const t of targets){t._spCostMultiplier=Math.max(t._spCostMultiplier||0,Number(e.amount||0));t._spCostDuration=Number(e.duration||1);}
   else if(e.type==='cooldown_increase')for(const t of targets){t._cooldownPenalty=Math.max(t._cooldownPenalty||0,Number(e.amount||0));t._cooldownDuration=Number(e.duration||1);}
