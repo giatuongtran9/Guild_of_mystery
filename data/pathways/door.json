@@ -67,8 +67,12 @@
         "tag": null,
         "effects": [
           {
-            "type": "status_chance",
-            "status": "stunned",
+            "type": "status_pool",
+            "statuses": [
+              "freeze",
+              "burn",
+              "stunned"
+            ],
             "chance": 0.35,
             "duration": 1
           }
@@ -253,7 +257,7 @@
         "cooldown": 4,
         "description": "Star Gate Tear — Opens a celestial tear dealing 300% INT AoE damage; reduces enemy ATK & DEF by 25%.",
         "stat": "INT",
-        "scale": 3.0,
+        "scale": 3,
         "damageType": "elemental",
         "formula": "pure_caster_ability",
         "tag": null,
@@ -289,7 +293,7 @@
         "cooldown": 5,
         "description": "Conceptual Unseal & Seal — Strips enemy barriers and seals active skills for 1 round + 400% INT True DMG.",
         "stat": "INT",
-        "scale": 4.0,
+        "scale": 4,
         "damageType": "true",
         "formula": "pure_caster_ability",
         "tag": null,
