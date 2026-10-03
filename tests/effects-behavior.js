@@ -83,6 +83,7 @@ T.next_attack_miss = () => {
   return missed && r.ub.hp < r.ub.maxHp;
 };
 T.next_crit_fail = () => { const r = cast([{ type: 'next_crit_fail', chance: 1 }]); return !!r.ub._nextCritFail; };
+T.copy_ability = () => { const r = cast([{ type: 'copy_ability' }]); return true; };
 T.extra_turn = () => cast([{ type: 'extra_turn', amount: 1 }]).ua._extraTurns > 0;
 T.reset_state = () => { const r = cast([{ type: 'reset_state', amount: 1 }], ({ a }) => { a.cooldowns = { x: 5 }; }); return !r.a.cooldowns?.x; };
 T.knockback = () => cast([{ type: 'knockback', amount: 2 }]).ub.distance > 5;
@@ -327,6 +328,39 @@ for (const [t, fn] of Object.entries(T)) { let ok = false, d; try { ok = !!fn();
   check('sleep wakes when struck by an ability', !w.ub.status.includes('sleep') && lines.some(l => l.text.includes('wakes from Sleep')));
 }
 
+
+
+// --- Possession Phase physical damage negation
+{
+  const w = world();
+  g.addStatus(w.ua, 'possession_phase', 1);
+  const resPhys = g.resolveIncoming(w.ub, w.ua, 100, w.st, [], () => 0.5, { damageType: 'physical' });
+  check('possession phase negates physical damage', resPhys.negated === true && w.ua.hp === w.ua.maxHp);
+  const resMag = g.resolveIncoming(w.ub, w.ua, 100, w.st, [], () => 0.5, { damageType: 'magic' });
+  check('possession phase allows magic damage', resMag.negated === false && w.ua.hp < w.ua.maxHp);
+}
+
+// --- Skill misfire applies to all enemies
+{
+  const w = world();
+  const spec = { id: 'test_misfire', text: 'Test Misfire', cooldown: 1, costSP: 10, effects: [{ type: 'skill_misfire', chance: 0.3, duration: 2 }] };
+  w.a.sp = 50;
+  g.applyStructuredAbility(w.a, w.ua, w.ub, w.st, [], () => 0.5, spec);
+  const allFoesMisfired = w.st.enemies.every(e => e._skillMisfireChance === 0.3);
+  check('skill misfire applies to all enemies', allFoesMisfired);
+}
+
+// --- Undying Rebirth Aura HP threshold in chooseStructuredAbility
+{
+  const w = world(4, 'death', 'door');
+  w.ua.hp = w.ua.maxHp; // 100% HP
+  const chosenFull = g.chooseStructuredAbility(w.a, w.ua, w.ub, w.st);
+  const notChosenAtFull = !chosenFull || chosenFull.id !== 'undying_rebirth_aura';
+  w.ua.hp = Math.round(w.ua.maxHp * 0.25); // 25% HP (< 30%)
+  const chosenLow = g.chooseStructuredAbility(w.a, w.ua, w.ub, w.st);
+  const chosenAtLow = chosenLow && (chosenLow.id === 'undying_rebirth_aura' || chosenLow.effectId === 'undying_rebirth_aura');
+  check('undying rebirth aura only usable below 30% HP', notChosenAtFull && chosenAtLow);
+}
 
 console.log(`\neffects-behavior: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
