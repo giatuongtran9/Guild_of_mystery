@@ -1,3 +1,283 @@
+
+// Structured combat event emission helpers
+function teamOf(u, state) {
+  if (!state) return 'ally';
+  if (state.allies && state.allies.some(x => x.id === u?.id || (u?.name && x.name === u.name))) return 'ally';
+  if (state.enemies && state.enemies.some(x => x.id === u?.id || (u?.name && x.name === u.name))) return 'enemy';
+  return u?.agent ? 'ally' : 'enemy';
+}
+function emitCombatEvent(state, ev) {
+  if (!state || !state.events) return;
+  if (ev.round === undefined) ev.round = state.currentRound || 0;
+  state.events.push(ev);
+}
+
+function abbrNum(num) {
+  if (num == null || isNaN(num)) return '0';
+  const n = Math.abs(Number(num));
+  const sign = num < 0 ? '−' : '';
+  if (n >= 1000000) {
+    const v = (n / 1000000).toFixed(1).replace(/\.0$/, '');
+    return `${sign}${v}M`;
+  }
+  if (n >= 10000) {
+    const v = (n / 1000).toFixed(1).replace(/\.0$/, '');
+    return `${sign}${v}K`;
+  }
+  if (n >= 1000) {
+    return `${sign}${Number(n).toLocaleString()}`;
+  }
+  return `${sign}${Math.round(n)}`;
+}
+
+function groupEventsToRows(events, battleSnapshot) {
+  const rounds = [];
+  let currentRound = null;
+  let activeTurn = null;
+
+  function getRound(r) {
+    if (!currentRound || currentRound.round !== r) {
+      if (activeTurn) {
+        currentRound.rows.push(activeTurn);
+        activeTurn = null;
+      }
+      currentRound = { round: r, rows: [], initiative: null, stats: [] };
+      rounds.push(currentRound);
+    }
+    return currentRound;
+  }
+
+  for (let i = 0; i < (events || []).length; i++) {
+    const ev = events[i];
+    const r = getRound(ev.round || 0);
+
+    if (ev.type === 'round_start') {
+      if (activeTurn) {
+        r.rows.push(activeTurn);
+        activeTurn = null;
+      }
+      continue;
+    }
+
+    if (ev.type === 'system') {
+      if (ev.subtype === 'initiative') {
+        r.initiative = ev.details || ev.text;
+      } else if (ev.subtype === 'combat_begins') {
+        r.stats.push(ev);
+      }
+      continue;
+    }
+
+    if (ev.type === 'story') {
+      r.rows.push({
+        id: `story_${ev.round}_${i}`,
+        round: ev.round,
+        type: 'story',
+        text: ev.text
+      });
+      continue;
+    }
+
+    if (ev.type === 'cast') {
+      if (activeTurn) {
+        r.rows.push(activeTurn);
+      }
+      activeTurn = {
+        id: `turn_${ev.round}_${ev.actorId}_${i}`,
+        round: ev.round,
+        type: 'turn',
+        actorId: ev.actorId,
+        actorName: ev.actorName,
+        actorTeam: ev.actorTeam,
+        ability: ev.ability,
+        costSP: ev.costSP,
+        cooldown: ev.cooldown,
+        damages: [],
+        heals: [],
+        shields: [],
+        subrows: [],
+        deaths: []
+      };
+      continue;
+    }
+
+    if (activeTurn && ev.actorId === activeTurn.actorId && ev.type === 'damage') {
+      activeTurn.damages.push(ev);
+      continue;
+    }
+
+    if (activeTurn && ev.actorId === activeTurn.actorId && (ev.type === 'heal' || ev.type === 'shield')) {
+      if (ev.type === 'heal') activeTurn.heals.push(ev);
+      else activeTurn.shields.push(ev);
+      continue;
+    }
+
+    if (ev.type === 'damage') {
+      if (activeTurn) {
+        r.rows.push(activeTurn);
+      }
+      activeTurn = {
+        id: `turn_${ev.round}_${ev.actorId}_${i}`,
+        round: ev.round,
+        type: 'turn',
+        actorId: ev.actorId,
+        actorName: ev.actorName,
+        actorTeam: ev.actorTeam,
+        ability: ev.ability || 'Attack',
+        damages: [ev],
+        heals: [],
+        shields: [],
+        subrows: [],
+        deaths: []
+      };
+      continue;
+    }
+
+    if (ev.type === 'miss') {
+      if (activeTurn) {
+        r.rows.push(activeTurn);
+      }
+      activeTurn = {
+        id: `turn_${ev.round}_${ev.actorId}_${i}`,
+        round: ev.round,
+        type: 'turn',
+        actorId: ev.actorId,
+        actorName: ev.actorName,
+        actorTeam: ev.actorTeam,
+        ability: 'Attack',
+        targetName: ev.targetName,
+        targetTeam: ev.targetTeam,
+        isMiss: true,
+        text: ev.text,
+        damages: [],
+        heals: [],
+        shields: [],
+        subrows: [],
+        deaths: []
+      };
+      continue;
+    }
+
+    if (ev.type === 'status' && (ev.subtype === 'cc_loss' || ev.subtype === 'madness_loss' || ev.subtype === 'banished')) {
+      if (activeTurn) {
+        r.rows.push(activeTurn);
+      }
+      activeTurn = {
+        id: `turn_${ev.round}_${ev.actorId}_${i}`,
+        round: ev.round,
+        type: 'turn',
+        actorId: ev.actorId,
+        actorName: ev.actorName,
+        actorTeam: ev.actorTeam,
+        isSkip: true,
+        text: ev.text,
+        damages: [],
+        heals: [],
+        shields: [],
+        subrows: [],
+        deaths: []
+      };
+      continue;
+    }
+
+    if (ev.type === 'thread') {
+      if (activeTurn) {
+        activeTurn.subrows.push({ type: 'thread', text: ev.text });
+      } else {
+        r.rows.push({
+          id: `thread_${ev.round}_${i}`,
+          round: ev.round,
+          type: 'thread',
+          text: ev.text
+        });
+      }
+      continue;
+    }
+
+    if (ev.type === 'status') {
+      if (activeTurn) {
+        activeTurn.subrows.push({ type: 'status', text: ev.text });
+      } else {
+        r.rows.push({
+          id: `status_${ev.round}_${i}`,
+          round: ev.round,
+          type: 'status',
+          text: ev.text
+        });
+      }
+      continue;
+    }
+
+    if (ev.type === 'death') {
+      if (activeTurn) {
+        activeTurn.deaths.push(ev);
+      } else {
+        r.rows.push({
+          id: `death_${ev.round}_${i}`,
+          round: ev.round,
+          type: 'death',
+          targetName: ev.targetName,
+          targetTeam: ev.targetTeam,
+          text: ev.text
+        });
+      }
+      continue;
+    }
+
+    if (ev.type === 'result') {
+      if (activeTurn) {
+        r.rows.push(activeTurn);
+        activeTurn = null;
+      }
+      r.rows.push({
+        id: `result_${ev.round}_${i}`,
+        round: ev.round,
+        type: 'result',
+        success: ev.success,
+        text: ev.text
+      });
+      continue;
+    }
+  }
+
+  if (activeTurn && currentRound) {
+    currentRound.rows.push(activeTurn);
+  }
+
+  return rounds;
+}
+
+function summarizeBattleEvents(events, battleSnapshot) {
+  let rounds = 0;
+  let totalDamageDealt = 0;
+  const deadAllies = [];
+  const deadEnemies = [];
+
+  for (const ev of (events || [])) {
+    if (ev.round > rounds) rounds = ev.round;
+    if (ev.type === 'damage' && ev.amount) {
+      totalDamageDealt += ev.amount;
+    }
+    if (ev.type === 'death' && ev.targetName) {
+      if (ev.targetTeam === 'ally' && !deadAllies.includes(ev.targetName)) {
+        deadAllies.push(ev.targetName);
+      } else if (ev.targetTeam === 'enemy' && !deadEnemies.includes(ev.targetName)) {
+        deadEnemies.push(ev.targetName);
+      }
+    }
+  }
+
+  const deaths = [...deadAllies.map(n => `${n} (Ally)`), ...deadEnemies.map(n => `${n} (Enemy)`)];
+  const deathSummary = deaths.length ? `Casualties: ${deaths.join(', ')}` : 'No casualties';
+  return {
+    rounds,
+    totalDamageDealt,
+    deadAllies,
+    deadEnemies,
+    summaryText: `${rounds} round${rounds === 1 ? '' : 's'} · Total Damage: ${abbrNum(totalDamageDealt)} · ${deathSummary}`
+  };
+}
+
 // ===== engine.js =====
 
 
@@ -441,6 +721,26 @@ function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
  agent.cooldowns[spec.effectId]=(baseCd > 0 ? baseCd + 1 : 0)+Number(agent._cooldownPenalty||0);agent._lastAbility=spec.effectId; if(state){state._abilityHistoryByUnit=state._abilityHistoryByUnit||{};(state._abilityHistoryByUnit[actor.id]=state._abilityHistoryByUnit[actor.id]||[]).push({spec:cloneE(spec),round:state.currentRound||1});}
  const effects=abilityEffects(spec), allies=sameSideOf(actor,state), targets=targetsForEffects(spec,actor,enemy,state);
  lines.push({text:`ACTION: ${actor.name} casts [${spec.text.split(' — ')[0]}] (Cost: ${cost} SP | ${spec.cooldown||0}-Turn CD).`,kind:'action'});
+    emitCombatEvent(state, {
+      round: state?.currentRound || 1,
+      type: 'cast',
+      actorId: actor.id,
+      actorName: actor.name,
+      actorTeam: teamOf(actor, state),
+      ability: spec.text.split(' — ')[0],
+      costSP: cost,
+      cooldown: spec.cooldown || 0
+    });
+    emitCombatEvent(state, {
+      round: state?.currentRound || 1,
+      type: 'cast',
+      actorId: actor.id,
+      actorName: actor.name,
+      actorTeam: teamOf(actor, state),
+      ability: spec.text.split(' — ')[0],
+      costSP: cost,
+      cooldown: spec.cooldown || 0
+    });
  for(const e of effects){
   const tgs=e.type==='buff'||e.type==='heal'||e.type==='cleanse'||e.type==='shield'||e.type==='revive'?[actor]:targets;
   if(e.type==='strip_buffs'||e.type==='nullify_buffs')for(const t of targets){removeFxCat(t,'buff');t.buffs=[];removeStatus(t,'guarded');removeStatus(t,'evade');if((t.shield||0)>0){lines.push({text:`${t.name}'s barrier (${t.shield} HP shield) is stripped away!`,kind:'status'});t.shield=0;}}
@@ -529,6 +829,26 @@ function powerEffect(a,actor,enemy,state,lines,r){
     if(!enemy.thread && (a.sp||0)>=threadCost && !(a.cooldowns?.thread_binding>0) && (a._threadAttempts||0)<budget){
       a.sp-=threadCost; a.cooldowns.thread_binding=threadCd > 0 ? threadCd + 1 : 0;
       lines.push({text:`ACTION: ${actor.name} casts [Thread Binding] (Cost: ${threadCost} SP | ${threadCd}-Turn CD).`,kind:'action'});
+    emitCombatEvent(state, {
+      round: state?.currentRound || 1,
+      type: 'cast',
+      actorId: actor.id,
+      actorName: actor.name,
+      actorTeam: teamOf(actor, state),
+      ability: 'Thread Binding',
+      costSP: threadCost,
+      cooldown: threadCd
+    });
+    emitCombatEvent(state, {
+      round: state?.currentRound || 1,
+      type: 'cast',
+      actorId: actor.id,
+      actorName: actor.name,
+      actorTeam: teamOf(actor, state),
+      ability: 'Thread Binding',
+      costSP: threadCost,
+      cooldown: threadCd
+    });
       applySpiritThread(a,enemy,actor,state,lines,r);
       return true;
     }
@@ -560,7 +880,7 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
  const r=rand(seed),lines=[],consequences=[],allies=members.map(a=>{const es=effectiveStats(a);const ag=cloneE(a); const pm=passiveCombatModifier(ag); ag.resistances={...(G9D.balance.element_resistance_rules?.path_resistances?.[ag.path]||{}),...(pm.resistances||{}),...(ag.resistances||{})}; return {id:a.id,name:a.name,agent:ag,hp:Math.round(es.hp*(pm.hp||1)),maxHp:Math.round(es.hp*(pm.hp||1)),alive:true,inCombat:true,status:[],statusMeta:{},resistances:ag.resistances};});
  const simulationOpponents=Array.isArray(decisions.simulationOpponents)?decisions.simulationOpponents:null; const enemyCount=simulationOpponents?.length || quest.enemyCount|| (allies.length===1?1:(allies.length>=3 && quest.difficultySequence>=7?2:(quest.difficultySequence>=5?2:3))); const enemies=quest.encounter?(simulationOpponents?simulationOpponents.map((spec,i)=>makeEnemy(spec.sequence,r,i,spec.path)):Array.from({length:enemyCount},(_,i)=>makeEnemy(quest.difficultySequence,r,i,quest.requiredPath))):[];
  for(const e of enemies){try{const epm=passiveCombatModifier(e);if(epm.hp&&epm.hp!==1){e.maxHp=Math.round(e.maxHp*epm.hp);e.hp=e.maxHp;}}catch(err){}}
- const individual=!!decisions.individual; const state={allies,enemies,individual,createdMarionettes:[],weaponUsage:{},combatStatsShown:false,balanceTrace:[]};
+ const individual=!!decisions.individual; const state={allies,enemies,individual,createdMarionettes:[],weaponUsage:{},combatStatsShown:false,balanceTrace:[],events:[]};
  lines.push({text:`Contract: ${quest.name}`,kind:'system'},{text:quest.story||quest.brief,kind:'story'});
  if(!quest.encounter){
    if(quest.objective==='rescue'){lines.push({text:'The guild searches the neighborhood rather than hunting for a fight. Clues lead through an alley, beneath a bakery awning, and into a coal shed.',kind:'system'},{text:'The missing cat is found frightened but unharmed and returned to its owner.',kind:'victory'});}
@@ -579,9 +899,9 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
 
  for(const a of allies)lines.push({text:`${a.name} — ${a.agent.path?`${pathOf(a.agent.path).name} · Sequence ${a.agent.sequence}`:'Unawakened'}.`,kind:'system'});
  let round=0;
- while(allies.some(x=>x.alive)&&enemies.some(x=>x.alive)&&round<15){round++;state.currentRound=round;startRoundCombatResources([...allies,...enemies],lines);lines.push({text:`· Round ${round} ·`,kind:'system'});
+ while(allies.some(x=>x.alive)&&enemies.some(x=>x.alive)&&round<15){round++;state.currentRound=round;startRoundCombatResources([...allies,...enemies],lines);lines.push({text:`· Round ${round} ·`,kind:'system'}); emitCombatEvent(state, {round, type: 'round_start'}); emitCombatEvent(state, {round, type: 'round_start'});
    for (const u of [...allies, ...enemies]) u._actedThisRound = false;                                                                
-   const initiativeLine=[...allies.filter(x=>x.alive),...enemies.filter(x=>x.alive)].sort((a,b)=>{const sa=unitInitiative(a);const sb=unitInitiative(b);return sb-sa;}).map(x=>`${x.name} ${unitInitiative(x).toFixed(1)}`).join(' → '); lines.push({text:`Initiative: ${initiativeLine}`,kind:'system'});
+   const initiativeLine=[...allies.filter(x=>x.alive),...enemies.filter(x=>x.alive)].sort((a,b)=>{const sa=unitInitiative(a);const sb=unitInitiative(b);return sb-sa;}).map(x=>`${x.name} ${unitInitiative(x).toFixed(1)}`).join(' → '); lines.push({text:`Initiative: ${initiativeLine}`,kind:'system'}); emitCombatEvent(state, {round, type: 'system', subtype: 'initiative', details: initiativeLine, text: `Initiative: ${initiativeLine}`}); emitCombatEvent(state, {round, type: 'system', subtype: 'initiative', details: initiativeLine, text: `Initiative: ${initiativeLine}`});
    processSpiritThreads(state,lines);                                                                 
    for(const unit of [...allies,...enemies])processStatuses(unit,t=>lines.push({text:t,kind:'status'}));
    tickCombatEffectDurations([...allies,...enemies]);applyPassiveAuras([...allies,...enemies],state);
@@ -590,9 +910,33 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
    for(const c of actors){if(!c.alive||c.inCombat===false)continue;beginTurn(c);c._actedThisRound = true;
        if(c._skipTurns>0||hasStatus(c,'banished')){if(c._skipTurns>0)c._skipTurns--;lines.push({text:`${c.name} is banished in a spatial fold and cannot act.`,kind:'status'});if(!c._skipTurns||c._skipTurns<=0){removeStatus(c,'banished');removeStatus(c,'untargetable');}continue;}
        if(c.agent){const pressure=0;
-       if((c.agent.madness||0)>=50&&r()<.18){lines.push({text:`${c.name} loses the action to mounting Madness.`,kind:'status'});continue;}if(actionDisabled(c)){lines.push({text:`${c.name} loses the action to Crowd Control.`,kind:'status'});continue;}
+       if((c.agent.madness||0)>=50&&r()<.18){lines.push({text:`${c.name} loses the action to mounting Madness.`,kind:'status'});continue;}if(actionDisabled(c)){
+      lines.push({text:`${c.name} loses the action to Crowd Control.`,kind:'status'});
+      emitCombatEvent(state, {
+        round: state?.currentRound || 1,
+        type: 'status',
+        subtype: 'cc_loss',
+        actorId: c.id,
+        actorName: c.name,
+        actorTeam: teamOf(c, state),
+        text: `${c.name} loses action to Crowd Control`
+      });
+      continue;
+    }
        if(c.thread&&c.thread.progress>=4&&r()<0.30){addStatus(c,'bound',1,'Spirit Body Thread');}if(hasStatus(c,'fear')&&r()<.35){lines.push({text:`${c.name} loses this action to a status effect.`,kind:'status'});continue;}const isConfused=hasStatus(c,'confused')&&r()<0.50;if(isConfused)lines.push({text:`${c.name} is Confused and targets an ally!`,kind:'status'});const targetPool=isConfused?allies.filter(a=>a.alive):enemies.filter(e=>e.alive);if(!targetPool.length)break;const enemy=pickR(r,tauntFilter(c,(()=>{const ok=targetPool.filter(x=>!hasStatus(x,'untargetable'));return ok.length?ok:targetPool;})()));if(!state.combatStatsShown)state.combatStatsShown={};if(!state.combatStatsShown[enemy.id]){lines.push({text:`Combat begins: ${enemy.name} · HP ${enemy.maxHp} · ATK ${enemy.atk} · DEF ${enemy.def} · INT ${enemy.int} · Speed ${speedFor(enemy).toFixed(1)} · AV ${actionValueFor(enemy).toFixed(1)}.`,kind:'system'});state.combatStatsShown[enemy.id]=true;}powerEffect(c.agent,c,enemy,state,lines,r); if(c._extraTurns>0&&c.alive){c._extraTurns--;powerEffect(c.agent,c,enemy,state,lines,r);}}
-     else {const isConfused=hasStatus(c,'confused')&&r()<0.50;if(isConfused)lines.push({text:`${c.name} is Confused and targets an ally!`,kind:'status'});const targets=(isConfused?enemies:allies).filter(x=>x.alive&&x.inCombat);if(!targets.length)break;if(actionDisabled(c)){lines.push({text:`${c.name} loses the action to Crowd Control.`,kind:'status'});continue;}
+     else {const isConfused=hasStatus(c,'confused')&&r()<0.50;if(isConfused)lines.push({text:`${c.name} is Confused and targets an ally!`,kind:'status'});const targets=(isConfused?enemies:allies).filter(x=>x.alive&&x.inCombat);if(!targets.length)break;if(actionDisabled(c)){
+      lines.push({text:`${c.name} loses the action to Crowd Control.`,kind:'status'});
+      emitCombatEvent(state, {
+        round: state?.currentRound || 1,
+        type: 'status',
+        subtype: 'cc_loss',
+        actorId: c.id,
+        actorName: c.name,
+        actorTeam: teamOf(c, state),
+        text: `${c.name} loses action to Crowd Control`
+      });
+      continue;
+    }
        if(c.thread&&c.thread.progress>=4&&r()<0.30){addStatus(c,'bound',1,'Spirit Body Thread');}
        const safer=targets.filter(x=>x.hp/x.maxHp>.25);const pool=(safer.length?safer:targets);const okp=pool.filter(x=>!hasStatus(x,'untargetable'));const t=pickR(r,tauntFilter(c,okp.length?okp:pool));
        const enemyAgent={...c,stats:{hp:c.maxHp,atk:c.atk,def:c.def,int:c.int},baseStats:{hp:c.maxHp,atk:c.atk,def:c.def,int:c.int},abilities:c.abilities||[],abilityHistory:c.abilityHistory||[],weaponId:c.weaponId||'none',weaponMastery:c.weaponMastery||{},cooldowns:c.cooldowns||{},resistances:{...(c.resistances||{}),...(passiveCombatModifier(c).resistances||{})},_outgoingMultiplier:(state.individual?COMBAT_BALANCE.enemyDamageIndividual:COMBAT_BALANCE.enemyDamageParty)};
@@ -610,5 +954,5 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
 }
 a.injuries=Math.min(100,(a.injuries||0)+(u.alive?Math.max(0,Math.round((u.maxHp-u.hp)/u.maxHp*25)):30));a.madness=Math.max(0,Math.min(100,(a.madness||0)+(success?-3:12)));changeMeter(a,a.path,success?12:6);if(!u.alive){consequences.push({type:'death',agentId:a.id,text:`${a.name} dies during the contract and is removed from the roster.`});}else{consequences.push({type:'syncAgent',agentId:a.id,agent:a,text:success?`${a.name} returns with new experience and ${gain}% digestion.`:`${a.name} returns shaken from the failed contract.`});}if(a.madness>=100)consequences.push({type:'corruptedDeath',agentId:a.id,text:`${a.name} reaches 100 Madness and becomes a corrupted monster.`});}
  const rewards=cloneE(quest.rewards);if(!success){rewards.funds=Math.round(rewards.funds*.35);rewards.reputation=0;}
- return {lines,success,consequences,marionettes:state.createdMarionettes,weaponUsage:state.weaponUsage,rewards,dayCost:1,battleSnapshot:{allies:allies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),enemies:enemies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),balanceTrace:state.balanceTrace}};
+ return {lines,events:state.events||[],success,consequences,marionettes:state.createdMarionettes,weaponUsage:state.weaponUsage,rewards,dayCost:1,battleSnapshot:{allies:allies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),enemies:enemies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),balanceTrace:state.balanceTrace,events:state.events||[]}};
 }
