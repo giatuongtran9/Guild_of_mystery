@@ -1,3 +1,4 @@
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 
 function flattenTurnRows(groupedRounds) {
   const flattened = [];
