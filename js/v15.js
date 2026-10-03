@@ -85,31 +85,82 @@ function applyPathResistances(unit,path){
   unit.resistances={...(unit.resistances||{}),...defaults};
   return unit.resistances;
 }
-function tryRevive(t, lines) {
+function tryRevive(t, lines, state) {
   if (t.alive || !t.agent) return;
   const spec = unlockedAbilities(t.agent).find(x => (x.effects||[]).some(e => e.type==='revive'));
   if (!spec || t._revived) return;
-  const rev=(spec.effects||[]).find(e=>e.type==='revive');
+  const rev = (spec.effects||[]).find(e => e.type==='revive' && e.self) || (spec.effects||[]).find(e => e.type==='revive');
   t._revived = true; t.alive = true; t.hp = Math.max(1, Math.round(t.maxHp * Number(rev?.hpRatio||.25)));
-  if (t.agent) t.agent.sp = 0;
-  lines.push({ text: `${t.name} is revived by ${spec.text.split(' — ')[0]} with ${t.hp} HP.`, kind: 'quirk' });
+  if (t.agent) t.agent.sp = Math.max(20, Math.round((t.agent.sp || 0) * 0.5));
+  let msg = rev?.reviveText
+    ? rev.reviveText.replace('{name}', t.name).replace('{hp}', t.hp)
+    : `${t.name} is revived by ${spec.text.split(' — ')[0]} with ${t.hp} HP.`;
+  lines.push({ text: msg, kind: 'quirk' });
+  if (state && typeof emitCombatEvent === 'function') {
+    emitCombatEvent(state, {
+      round: state.currentRound || 1,
+      type: 'heal',
+      actorId: t.id,
+      actorName: t.name,
+      actorTeam: teamOf(t, state),
+      targetId: t.id,
+      targetName: t.name,
+      targetTeam: teamOf(t, state),
+      amount: t.hp,
+      hpAfter: t.hp,
+      text: msg
+    });
+  }
 }
 // Mythical Creature Form: Seq 4+, once per battle, 50 SP; +30% Max HP shield, +20% all damage,
 // and every turn each enemy has a 20% chance to lose its turn. Abilities remain castable.
 function tryMythicalForm(agent, actor, state, lines, r) {
-  const unlocked = agent.sequence <= MYTHIC.unlocked_at_sequence;
-  if (unlocked && !actor._formUsed && (agent.sp || 0) >= MYTHIC.sp_cost && actor.hp / Math.max(1, actor.maxHp) < (MYTHIC.hp_threshold ?? 0.5)) {
-    agent.sp -= MYTHIC.sp_cost; actor._formUsed = true; actor._inForm = true; actor._formBoost = Math.max(actor._formBoost || 1, 1.20);
+  if (!agent || !actor || actor._formUsed) return;
+  const unlocked = agent.sequence <= (MYTHIC?.unlocked_at_sequence ?? 4);
+  const hpRatio = actor.hp / Math.max(1, actor.maxHp);
+  if (unlocked && hpRatio < (MYTHIC?.hp_threshold ?? 0.50)) {
+    actor._formUsed = true; actor._inForm = true; actor._formBoost = Math.max(actor._formBoost || 1, 1.20);
     const sh = Math.round(actor.maxHp * .30); actor.shield = Math.max(actor.shield || 0, sh);
-    lines.push({ text: `MYTHICAL FORM: ${actor.name} becomes ${pathOf(agent.path).mythicalForm || 'a mythical creature'} (+${sh} HP shield, +20% damage).`, kind: 'action' });
-
-    if (r() < 0.2) { 
-    for (const f of foesOf(actor, state)) {
-      if (f.alive) { 
-        addStatus(f, 'stunned', 1, actor.name); 
-        lines.push({ text: `${f.name} is overwhelmed by mental pollution and loses a turn.`, kind: 'status' }); 
-      }
+    const formName = (typeof pathOf === 'function' ? pathOf(agent.path)?.mythicalForm : null) || 'a mythical creature';
+    const desc = `MYTHICAL FORM: ${actor.name} awakens ${formName} (+${sh} HP shield, +20% damage).`;
+    lines.push({ text: desc, kind: 'action' });
+    if (state && typeof emitCombatEvent === 'function') {
+      emitCombatEvent(state, {
+        round: state.currentRound || 1,
+        type: 'shield',
+        actorId: actor.id,
+        actorName: actor.name,
+        actorTeam: teamOf(actor, state),
+        targetId: actor.id,
+        targetName: actor.name,
+        targetTeam: teamOf(actor, state),
+        amount: sh,
+        shieldAfter: actor.shield,
+        text: desc
+      });
     }
+
+    if (r && r() < 0.20) {
+      for (const f of foesOf(actor, state)) {
+        if (f.alive) {
+          addStatus(f, 'stunned', 1, actor.name);
+          const stunTxt = `${f.name} is overwhelmed by mental pollution and loses a turn.`;
+          lines.push({ text: stunTxt, kind: 'status' });
+          if (state && typeof emitCombatEvent === 'function') {
+            emitCombatEvent(state, {
+              round: state.currentRound || 1,
+              type: 'status',
+              actorId: actor.id,
+              actorName: actor.name,
+              actorTeam: teamOf(actor, state),
+              targetId: f.id,
+              targetName: f.name,
+              targetTeam: teamOf(f, state),
+              text: stunTxt
+            });
+          }
+        }
+      }
     }
   }
 }
