@@ -68,12 +68,17 @@
         "label": "Active",
         "spCost": 15,
         "cooldown": 1,
-        "description": "Spell Imitation — Copies and casts 1 basic elemental spell for 130% INT DMG.",
+        "description": "Spell Imitation — Records and reproduces 1 enemy skill executed in combat at 100% scaling.",
         "stat": "INT",
         "scale": 1.3,
         "damageType": "physical",
         "formula": "pure_caster_ability",
-        "tag": null
+        "tag": null,
+        "effects": [
+          {
+            "type": "copy_ability"
+          }
+        ]
       }
     },
     {
