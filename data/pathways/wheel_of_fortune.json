@@ -206,6 +206,10 @@
         "tag": null,
         "effects": [
           {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
+          {
             "type": "skill_misfire",
             "chance": 0.4,
             "duration": 2
