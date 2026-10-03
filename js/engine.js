@@ -555,8 +555,23 @@ function attackOnce(agent,actor,enemy,state,lines,r,mult=1){
  if(r()<dodgeChance){lines.push({text:`${actor.name}'s attack misses as ${enemy.name} reads the movement and dodges.`,kind:'status'});emitCombatEvent(state,{round:state?.currentRound||1,type:'miss',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:enemy.id,targetName:enemy.name,targetTeam:teamOf(enemy,state),text:`${actor.name}'s attack misses as ${enemy.name} reads the movement and dodges.`});return false;}
  const missChance=Math.max(0,Math.min(.95,weapon.masteryMiss-pm.hitChance+(actor._hitChanceDebuff||0)+(actor._threadHitDebuff||0))); if(r()<missChance){const missMsg=`${actor.name} misses with ${weapon.name}. ${weapon.kind==='gun'?`Gun Mastery Lv.${weapon.mastery} gives ${Math.round((1-missChance)*100)}% accuracy.`:'The attack misses.'}`;lines.push({text:missMsg,kind:'status'});emitCombatEvent(state,{round:state?.currentRound||1,type:'miss',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:enemy.id,targetName:enemy.name,targetTeam:teamOf(enemy,state),text:missMsg});return false;}
  handleSleepWake(enemy,lines); // v15 basic_physical_attack: round((ATK*ATK_mod + Weapon_Bonus_DMG) * Strike_Mult - DEF*0.5)
- let strikeMult=mult*(weapon.kind==='unarmed'?1+weaponMasteryValue(agent,'unarmed')*.04:1)*(enemy._weaknessBonus>0?1+enemy._weaknessBonus:1); let dmg=v15Damage('basic_physical_attack',{agent,actor,target:enemy,weaponBonus:weapon.atk*weapon.masteryDamage,strikeMult,defPen:pm.defPen});
- const rates=combatRates(agent,actor); let critChance=Math.min(.95,rates.crit+(weapon.crit||0)); if(actor._nextCritFail){critChance=0;actor._nextCritFail=0;} let critical=false; if(r()<critChance){critical=true;dmg=Math.round(dmg*(1+rates.critDamage));}
+ let strikeMult=mult*(weapon.kind==='unarmed'?1+weaponMasteryValue(agent,'unarmed')*.04:1)*(enemy._weaknessBonus>0?1+enemy._weaknessBonus:1);
+ const trace = {
+   round: state?.currentRound || 0,
+   attacker: actor.name,
+   target: enemy.name,
+   ability: weapon.name === 'Bare Hands' ? 'Attack' : weapon.name,
+   abilityId: 'basic_attack',
+   stat: 'ATK',
+   abilityMultiplier: mult,
+   effectiveMultiplier: strikeMult,
+   effectContributions: [],
+   damageType: 'physical'
+ };
+ let dmg=v15Damage('basic_physical_attack',{agent,actor,target:enemy,weaponBonus:weapon.atk*weapon.masteryDamage,strikeMult,defPen:pm.defPen,trace});
+ const rates=combatRates(agent,actor); let critChance=Math.min(.95,rates.crit+(weapon.crit||0)); if(actor._nextCritFail){critChance=0;actor._nextCritFail=0;} let critical=false; if(r()<critChance){critical=true;dmg=Math.round(dmg*(1+rates.critDamage));trace.critical=true;trace.effectContributions.push({type:'critical',multiplier:1+rates.critDamage});}
+ trace.final=dmg;
+ if(state?.balanceTrace) state.balanceTrace.push(trace);
  const tk=resolveIncoming(actor,enemy,dmg,state,lines,r,{damageType:'physical'});const dealt=tk.hpLoss+tk.absorbed;
  const totalLifeSteal=Math.max(0,pm.lifesteal+Number(traitData(agent).lifesteal||0)); if(totalLifeSteal>0&&dealt>0){const heal=Math.round(dealt*totalLifeSteal);actor.hp=Math.min(actor.maxHp,actor.hp+heal);lines.push({text:`${actor.name} recovers ${heal} HP from Lifesteal.`,kind:'status'});emitCombatEvent(state,{round:state?.currentRound||1,type:'heal',actorId:actor.id,actorName:actor.name,actorTeam:teamOf(actor,state),targetId:actor.id,targetName:actor.name,targetTeam:teamOf(actor,state),amount:heal,hpAfter:actor.hp,maxHp:actor.maxHp});}
  if(weapon.id!=='none') state.weaponUsage[weapon.id]=(state.weaponUsage[weapon.id]||0)+1;
@@ -685,6 +700,22 @@ function chooseStructuredAbility(agent,actor,enemy,state){
  if(agent.path==='error' && agent.sequence===9){const x=specs.find(s=>s.id==='combat_theft'||s.effectId==='combat_theft');if(x)return x;}
 
  // Time Theft: if all enemies have already moved this round, skip Time Theft and pick another skill
+   // Combat Record: skip until at least one enemy has cast an eligible ability (Option 1)
+  const anyEnemyCast = foesOf(actor, state).some(e => {
+    const history = state?._abilityHistoryByUnit?.[e.id];
+    return history && history.some(h => {
+      const hid = h.spec?.id || h.spec?.effectId;
+      return hid && hid !== 'combat_record';
+    });
+  });
+  if (!anyEnemyCast) {
+    specs = specs.filter(s => {
+      const sid = s.id || s.effectId;
+      return sid !== 'combat_record' && !abilityEffects(s).some(e => e.type === 'copy_ability');
+    });
+    if (!specs.length) return null;
+  }
+
  const enemiesPendingAction = foesOf(actor, state).filter(e => e.alive && !e._actedThisRound);
  specs = specs.filter(s => { if ((s.id === 'undying_rebirth_aura' || s.effectId === 'undying_rebirth_aura') && hpRatio >= 0.30) return false; return true; });
  const undyingAura = specs.find(x => (x.id === 'undying_rebirth_aura' || x.effectId === 'undying_rebirth_aura'));
@@ -725,16 +756,54 @@ function targetsForEffects(spec,actor,enemy,state){
 }
 function getCopiedEnemyAbility(actor, enemy, state) {
   const round = state?.currentRound || 1;
-  const enemyLog = state?._abilityHistoryByUnit?.[enemy.id];
-  if (!enemyLog || !enemyLog.length) {
-    const enemySpecs = (enemy.abilities || enemy.abilityHistory || []).filter(x => (x.type === 'active' || x.kind === 'active') && x.id !== 'combat_record' && x.effectId !== 'combat_record');
-    return enemySpecs.length ? cloneE(enemySpecs[0]) : null;
+  const foes = foesOf(actor, state);
+  
+  // 1. Check if selected enemy cast an eligible ability this round
+  const enemyLog = state?._abilityHistoryByUnit?.[enemy.id] || [];
+  const enemyThisRound = enemyLog.filter(x => {
+    const xid = x.spec?.id || x.spec?.effectId;
+    return x.round === round && xid !== 'combat_record';
+  });
+  if (enemyThisRound.length > 0) return cloneE(enemyThisRound[enemyThisRound.length - 1].spec);
+
+  // 2. Check if ANY enemy cast an eligible ability this round
+  const allFoesThisRound = [];
+  for (const f of foes) {
+    const fLog = state?._abilityHistoryByUnit?.[f.id] || [];
+    for (const entry of fLog) {
+      const xid = entry.spec?.id || entry.spec?.effectId;
+      if (entry.round === round && xid !== 'combat_record') {
+        allFoesThisRound.push(entry);
+      }
+    }
   }
-  const thisRound = enemyLog.filter(x => x.round === round);
-  if (thisRound.length > 0) {
-    return cloneE(thisRound[thisRound.length - 1].spec);
+  if (allFoesThisRound.length > 0) return cloneE(allFoesThisRound[allFoesThisRound.length - 1].spec);
+
+  // 3. Fallback to target enemy latest cast in prior rounds
+  const enemyPrior = enemyLog.filter(x => {
+    const xid = x.spec?.id || x.spec?.effectId;
+    return xid !== 'combat_record';
+  });
+  if (enemyPrior.length > 0) return cloneE(enemyPrior[enemyPrior.length - 1].spec);
+
+  // 4. Fallback to ANY enemy latest cast in prior rounds
+  const allFoesPrior = [];
+  for (const f of foes) {
+    const fLog = state?._abilityHistoryByUnit?.[f.id] || [];
+    for (const entry of fLog) {
+      const xid = entry.spec?.id || entry.spec?.effectId;
+      if (xid !== 'combat_record') {
+        allFoesPrior.push(entry);
+      }
+    }
   }
-  return cloneE(enemyLog[enemyLog.length - 1].spec);
+  if (allFoesPrior.length > 0) return cloneE(allFoesPrior[allFoesPrior.length - 1].spec);
+
+  // 5. Ultimate fallback to active ability pool
+  const enemyAgent = enemy.agent || enemy;
+  const enemySpecs = (typeof unlockedAbilities === 'function' ? unlockedAbilities(enemyAgent) : (enemy.abilities || []))
+    .filter(x => (x.type === 'active' || x.kind === 'active') && (x.id || x.effectId) !== 'combat_record');
+  return enemySpecs.length ? cloneE(enemySpecs[0]) : null;
 }
 function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
  ensureCombatResource(agent); let cost=Number(spec.costSP||0);
@@ -768,7 +837,38 @@ function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
   else if(e.type==='status_pool'){for(const t of targets)if(t.alive){const pool=e.statuses||[];if(pool.length&&(e.chance==null||r()<Number(e.chance))){const st=pickR(r,pool);addStatus(t,st,Number(e.duration||1),actor.name);}}}
   else if(e.type==='status_chance'){for(const t of targets)if(t.alive){const mental=['sleep','silenced','confused','charmed','stunned','bound','dreambound','controlled','fear','illusion'].includes(e.status);const resist=mental?Number(combatRates(t.agent||t).resistance||0):0;if(r()<Number(e.chance||0)*(1-resist)*(1-statusResistChance(t,e.status)))addStatus(t,e.status,Number(e.duration||1),actor.name);}}
   else if(e.type==='skill_misfire'){const mTargets=foesOf(actor,state).filter(x=>x.alive);for(const t of mTargets){t._skillMisfireChance=Math.max(t._skillMisfireChance||0,Number(e.chance||.3));t._skillMisfireDuration=Math.max(t._skillMisfireDuration||0,Number(e.duration||2));lines.push({text:`${t.name} is afflicted by skill misfire (${Math.round(Number(e.chance||.3)*100)}% chance).`,kind:'status'});}}
-  else if(e.type==='copy_ability'||spec.id==='combat_record'||spec.id==='spell_imitation'){const copied=getCopiedEnemyAbility(actor,enemy,state);if(copied&&copied.id!==spec.id&&copied.effectId!==spec.effectId){lines.push({text:`${actor.name} reproduces [${copied.name||copied.text?.split(' — ')[0]||'enemy ability'}]!`,kind:'action'});const cEffs=abilityEffects(copied);for(const ce of cEffs){if(ce.type!=='copy_ability'&&!effects.some(x=>x.type===ce.type&&x.stat===ce.stat&&x.status===ce.status))effects.push(ce);}if(!(spec.damage?.multiplier||spec.scale>0)&&(copied.scale||copied.damage?.multiplier)){spec.scale=copied.scale||copied.damage?.multiplier;if(!spec.stat)spec.stat=copied.stat||'INT';if(!spec.damageType)spec.damageType=copied.damageType||'magic';}}}
+  else if(e.type==='copy_ability'||spec.id==='combat_record'||spec.effectId==='combat_record'||spec.id==='spell_imitation'||spec.effectId==='spell_imitation'){
+    const copied=getCopiedEnemyAbility(actor,enemy,state);
+    const selfId = spec.id || spec.effectId;
+    const copiedId = copied ? (copied.id || copied.effectId) : null;
+    if(copied && copiedId && copiedId !== selfId){
+      const copiedName = copied.name || (copied.text ? copied.text.split(' — ')[0] : 'enemy ability');
+      lines.push({text:`${actor.name} reproduces [${copiedName}]!`,kind:'action'});
+      emitCombatEvent(state,{
+        round: state?.currentRound || 1,
+        type: 'status',
+        actorId: actor.id,
+        actorName: actor.name,
+        actorTeam: teamOf(actor, state),
+        targetId: enemy.id,
+        targetName: enemy.name,
+        targetTeam: teamOf(enemy, state),
+        text: `${actor.name} reproduces [${copiedName}]!`
+      });
+      const cEffs=abilityEffects(copied);
+      for(const ce of cEffs){
+        if(ce.type!=='copy_ability'&&!effects.some(x=>x.type===ce.type&&x.stat===ce.stat&&x.status===ce.status))effects.push(ce);
+      }
+      if(copied.damage){
+        spec.damage = cloneE(copied.damage);
+      }
+      if(!(spec.damage?.multiplier||spec.scale>0)&&(copied.scale||copied.damage?.multiplier)){
+        spec.scale=copied.scale||copied.damage?.multiplier;
+        if(!spec.stat)spec.stat=copied.stat||'INT';
+        if(!spec.damageType)spec.damageType=copied.damageType||'magic';
+      }
+    }
+  }
   else if(e.type==='mind_control'){const ally=foesOf(actor,state).find(x=>x!==enemy&&x.alive);if(ally){const dmg=Math.max(1,Math.round((enemy.atk||enemy.agent?.stats?.atk||10)*Number(e.damageMultiplier||1.5)));lines.push({text:`${enemy.name} turns its own power against ${ally.name} for ${dmg} damage.`,kind:'quirk'});resolveIncoming(enemy,ally,dmg,state,lines,r);if(ally.hp<=0){ally.hp=0;ally.alive=false;}}addStatus(enemy,'stunned',1,actor.name);}
   else if(e.type==='reflect'){{const d=fxDuration(e,'reflect');actor._reflect={mode:e.mode==='stat'?'stat':'share',stat:String(e.stat||'INT').toUpperCase(),multiplier:Number(e.multiplier||0),share:Number(e.share||0),element:e.element||'physical',negate:!!e.negate,untilTurn:d==='next_turn',rounds:d==='next_turn'?0:Number(d)};lines.push({text:`${actor.name} is wrapped in a reflecting ward${e.negate?' that negates incoming damage':''} ${d==='next_turn'?'until their next turn':'for '+Number(d)+' rounds'}.`,kind:'status'});}}
   else if(e.type==='taunt'){const d=fxDuration(e,'taunt');if(d==='next_turn')actor._tauntUntilTurn=true;else actor._taunt=Math.max(actor._taunt||0,Number(d));lines.push({text:`${actor.name} taunts the enemy ${d==='next_turn'?'until their next turn':'for '+Number(d)+' rounds'}.`,kind:'status'});}
