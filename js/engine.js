@@ -369,7 +369,7 @@ function activeSpecs(agent){return unlockedAbilities(agent).filter(x=>x.type==='
 function abilityReady(agent,spec){ensureCombatResource(agent);const cost=Math.round(Number(spec.costSP||0)*(1+Number(agent._spCostMultiplier||0))); return (agent.sp||0)>=cost&&!(agent.cooldowns?.[spec.effectId]>0)&&!hasStatus({status:agent.status||[]},'silenced');}
 function abilityAvailable(agent,effectId){return unlockedAbilities(agent).some(x=>x.effectId===effectId||x.id===effectId);}
 function chooseStructuredAbility(agent,actor,enemy,state){
- const hpRatio=actor.hp/Math.max(1,actor.maxHp), specs=activeSpecs(agent).filter(x=>x.effectId!=='thread_binding'&&abilityReady(agent,x));  // Thread Binding is resolved in powerEffect via applySpiritThread
+ const hpRatio=actor.hp/Math.max(1,actor.maxHp), let specs=activeSpecs(agent).filter(x=>x.effectId!=='thread_binding'&&abilityReady(agent,x));  // Thread Binding is resolved in powerEffect via applySpiritThread
  if(!specs.length)return null;
  // Fool: bank SP for Thread Binding (45 SP) instead of spending it on cheap casts every round.
  if(agent.path==='fool'&&agent.sequence<=5&&abilityAvailable(agent,'thread_binding')&&!(agent.cooldowns?.thread_binding>0)&&(agent.sp||0)<45)return null;
