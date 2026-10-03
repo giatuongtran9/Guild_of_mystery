@@ -13,37 +13,45 @@ function flattenTurnRows(groupedRounds) {
 
 function calculateCurrentHp(initialAllies, initialEnemies, shownRows) {
   const hpMap = {};
-  for (const a of (initialAllies || [])) hpMap[a.id || a.name] = { ...a, curHp: a.maxHp, maxHp: a.maxHp };
-  for (const e of (initialEnemies || [])) hpMap[e.id || e.name] = { ...e, curHp: e.maxHp, maxHp: e.maxHp };
+  for (const a of (initialAllies || [])) {
+    const entry = { ...a, curHp: a.maxHp, maxHp: a.maxHp };
+    if (a.id) hpMap[a.id] = entry;
+    if (a.name) hpMap[a.name] = entry;
+  }
+  for (const e of (initialEnemies || [])) {
+    const entry = { ...e, curHp: e.maxHp, maxHp: e.maxHp };
+    if (e.id) hpMap[e.id] = entry;
+    if (e.name) hpMap[e.name] = entry;
+  }
 
   for (const row of shownRows) {
     if (row.damages) {
       for (const d of row.damages) {
-        const key = d.targetId || d.targetName;
-        if (hpMap[key]) {
-          if (d.hpAfter !== undefined) hpMap[key].curHp = d.hpAfter;
-          else hpMap[key].curHp = Math.max(0, hpMap[key].curHp - (d.amount || 0));
+        const target = hpMap[d.targetId] || hpMap[d.targetName];
+        if (target) {
+          if (d.hpAfter !== undefined) target.curHp = d.hpAfter;
+          else target.curHp = Math.max(0, target.curHp - (d.amount || 0));
         }
       }
     }
     if (row.heals) {
       for (const h of row.heals) {
-        const key = h.targetId || h.targetName;
-        if (hpMap[key]) {
-          if (h.hpAfter !== undefined) hpMap[key].curHp = h.hpAfter;
-          else hpMap[key].curHp = Math.min(hpMap[key].maxHp, hpMap[key].curHp + (h.amount || 0));
+        const target = hpMap[h.targetId] || hpMap[h.targetName];
+        if (target) {
+          if (h.hpAfter !== undefined) target.curHp = h.hpAfter;
+          else target.curHp = Math.min(target.maxHp, target.curHp + (h.amount || 0));
         }
       }
     }
     if (row.deaths) {
       for (const d of row.deaths) {
-        const key = d.targetId || d.targetName;
-        if (hpMap[key]) hpMap[key].curHp = 0;
+        const target = hpMap[d.targetId] || hpMap[d.targetName];
+        if (target) target.curHp = 0;
       }
     }
-    if (row.type === 'death' && row.targetName) {
-      const key = row.targetId || row.targetName;
-      if (hpMap[key]) hpMap[key].curHp = 0;
+    if (row.type === 'death' && (row.targetId || row.targetName)) {
+      const target = hpMap[row.targetId] || hpMap[row.targetName];
+      if (target) target.curHp = 0;
     }
   }
   return hpMap;
@@ -51,7 +59,7 @@ function calculateCurrentHp(initialAllies, initialEnemies, shownRows) {
 
 function renderHpStrip(hpMap, allies, enemies) {
   function card(u, team) {
-    const data = hpMap[u.id || u.name] || { curHp: u.hp || u.maxHp, maxHp: u.maxHp };
+    const data = (u.id && hpMap[u.id]) || (u.name && hpMap[u.name]) || { curHp: u.hp || u.maxHp, maxHp: u.maxHp };
     const cur = Math.max(0, data.curHp);
     const max = Math.max(1, data.maxHp);
     const pct = Math.min(100, Math.round((cur / max) * 100));
@@ -350,6 +358,23 @@ function equipmentPicker(a){const options=Object.values(WEAPONS).filter(w=>w.id=
     </div></div>`;
   }
   window.G9={
+    setTickerSpeed: spd => {
+      tickerSpeed = Number(spd) || 1;
+      render();
+    },
+    toggleDetails: () => {
+      showBattleDetails = !showBattleDetails;
+      render();
+    },
+    toggleSimDetails: () => {
+      simBattleDetails = !simBattleDetails;
+      render();
+    },
+    onTickerScroll: el => {
+      if (!el) return;
+      const atBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) <= 35;
+      userScrolledUp = !atBottom;
+    },
     tab:t=>{tab=t;render()},previewPath:path=>{if(PATH_KEYS.includes(path)){previewPath=path;render()}},simMode:m=>{simMode=m;render()},simSet:(team,i,key,value)=>{const arr=team==='A'?simA:simB;if(arr[i])arr[i][key]=value;render()},clearSimulation:()=>{simResult=null;render()},runSimulation:()=>{const seed=Date.now()%2147483647;const count=simMode==='1v1'?1:2;const mk=(x,i)=>{const a=makeAgent(Math.random,{sequence:x.sequence,path:x.path,trait:'Stout Vitality'});a.id=`sim_${i}_${x.path}_${x.sequence}`;a.name=`${pathOf(x.path).name} Seq ${x.sequence}`;a.awakened=true;a.path=x.path;a.sequence=x.sequence;a.recommendedPath=x.path;a.injuries=0;a.weaponId='none';a.weaponMastery={};a.sp=maxSPFor(a);restatAgent(a);return a;};const members=simA.slice(0,count).map((x,i)=>mk(x,i));const opponents=simB.slice(0,count).map((x,i)=>({path:x.path,sequence:x.sequence}));const q={id:'sim',name:`${simMode} Battle`,brief:'Battle Simulator',story:'A controlled simulation. No guild resources are changed.',objective:'combat',difficultySequence:Math.min(...opponents.map(x=>x.sequence)),encounter:true,mundane:false,rewards:{funds:0,reputation:0,materials:{}},enemyCount:count,requiredPath:opponents[0].path};const res=resolveQuest(members,q,seed,{individual:count===1,simulationOpponents:opponents});const snap=res.battleSnapshot||{allies:[],enemies:[]};const simTurns = flattenTurnRows(groupEventsToRows(res.events||[]));
     const simSummary = summarizeBattleEvents(res.events||[], snap);
     simResult={success:res.success,rounds:res.lines.filter(x=>/^· Round /.test(x.text)).length,lines:res.lines,events:res.events||[],turnRows:simTurns,summaryText:simSummary.summaryText,teamA:snap.allies,teamB:snap.enemies,balanceTrace:snap.balanceTrace||[]};render()},fastTicker:()=>{if(!run)return;run.currentTurn=Math.min(run.turnRows.length,run.currentTurn+5);render();},skipTicker:()=>{if(!run)return;run.currentTurn=run.turnRows.length;render();},dossier:id=>{selected=id;render()},closeDossier:()=>{selected=null;render()},recruitInfo:id=>{const a=state.recruitPool.find(x=>x.id===id);if(a){toast(`${a.name}: ${a.occupation}. Recommended ${pathName(a.recommendedPath)}.`)}},
