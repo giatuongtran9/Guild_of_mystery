@@ -731,16 +731,6 @@ function applyStructuredAbility(agent,actor,enemy,state,lines,r,spec){
       costSP: cost,
       cooldown: spec.cooldown || 0
     });
-    emitCombatEvent(state, {
-      round: state?.currentRound || 1,
-      type: 'cast',
-      actorId: actor.id,
-      actorName: actor.name,
-      actorTeam: teamOf(actor, state),
-      ability: spec.text.split(' — ')[0],
-      costSP: cost,
-      cooldown: spec.cooldown || 0
-    });
  for(const e of effects){
   const tgs=e.type==='buff'||e.type==='heal'||e.type==='cleanse'||e.type==='shield'||e.type==='revive'?[actor]:targets;
   if(e.type==='strip_buffs'||e.type==='nullify_buffs')for(const t of targets){removeFxCat(t,'buff');t.buffs=[];removeStatus(t,'guarded');removeStatus(t,'evade');if((t.shield||0)>0){lines.push({text:`${t.name}'s barrier (${t.shield} HP shield) is stripped away!`,kind:'status'});t.shield=0;}}
@@ -839,16 +829,6 @@ function powerEffect(a,actor,enemy,state,lines,r){
       costSP: threadCost,
       cooldown: threadCd
     });
-    emitCombatEvent(state, {
-      round: state?.currentRound || 1,
-      type: 'cast',
-      actorId: actor.id,
-      actorName: actor.name,
-      actorTeam: teamOf(actor, state),
-      ability: 'Thread Binding',
-      costSP: threadCost,
-      cooldown: threadCd
-    });
       applySpiritThread(a,enemy,actor,state,lines,r);
       return true;
     }
@@ -899,9 +879,9 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
 
  for(const a of allies)lines.push({text:`${a.name} — ${a.agent.path?`${pathOf(a.agent.path).name} · Sequence ${a.agent.sequence}`:'Unawakened'}.`,kind:'system'});
  let round=0;
- while(allies.some(x=>x.alive)&&enemies.some(x=>x.alive)&&round<15){round++;state.currentRound=round;startRoundCombatResources([...allies,...enemies],lines);lines.push({text:`· Round ${round} ·`,kind:'system'}); emitCombatEvent(state, {round, type: 'round_start'}); emitCombatEvent(state, {round, type: 'round_start'});
+ while(allies.some(x=>x.alive)&&enemies.some(x=>x.alive)&&round<15){round++;state.currentRound=round;startRoundCombatResources([...allies,...enemies],lines);lines.push({text:`· Round ${round} ·`,kind:'system'}); emitCombatEvent(state, {round, type: 'round_start'});
    for (const u of [...allies, ...enemies]) u._actedThisRound = false;                                                                
-   const initiativeLine=[...allies.filter(x=>x.alive),...enemies.filter(x=>x.alive)].sort((a,b)=>{const sa=unitInitiative(a);const sb=unitInitiative(b);return sb-sa;}).map(x=>`${x.name} ${unitInitiative(x).toFixed(1)}`).join(' → '); lines.push({text:`Initiative: ${initiativeLine}`,kind:'system'}); emitCombatEvent(state, {round, type: 'system', subtype: 'initiative', details: initiativeLine, text: `Initiative: ${initiativeLine}`}); emitCombatEvent(state, {round, type: 'system', subtype: 'initiative', details: initiativeLine, text: `Initiative: ${initiativeLine}`});
+   const initiativeLine=[...allies.filter(x=>x.alive),...enemies.filter(x=>x.alive)].sort((a,b)=>{const sa=unitInitiative(a);const sb=unitInitiative(b);return sb-sa;}).map(x=>`${x.name} ${unitInitiative(x).toFixed(1)}`).join(' → '); lines.push({text:`Initiative: ${initiativeLine}`,kind:'system'}); emitCombatEvent(state, {round, type: 'system', subtype: 'initiative', details: initiativeLine, text: `Initiative: ${initiativeLine}`});
    processSpiritThreads(state,lines);                                                                 
    for(const unit of [...allies,...enemies])processStatuses(unit,t=>lines.push({text:t,kind:'status'}));
    tickCombatEffectDurations([...allies,...enemies]);applyPassiveAuras([...allies,...enemies],state);
