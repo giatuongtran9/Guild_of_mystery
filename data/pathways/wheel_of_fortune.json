@@ -45,7 +45,7 @@
         "effects": [
           {
             "type": "damage_taken",
-            "amount": -0.04
+            "amount": -0.15
           },
           {
             "type": "dodge",
