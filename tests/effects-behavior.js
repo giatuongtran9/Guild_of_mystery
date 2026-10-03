@@ -274,5 +274,59 @@ for (const [t, fn] of Object.entries(T)) { let ok = false, d; try { ok = !!fn();
   check('HP passive (Death 9) is applied to combat max HP', pm.hp > 1 && !!snap && Math.abs(snap.maxHp - expected) <= 1, `snap=${snap && snap.maxHp} expected=${expected}`);
 }
 
+
+{ // Silenced unit cannot cast structured ability but still executes normal basic attack
+  const w = world(4, 'door', 'fool');
+  w.ua.status.push('silenced');
+  const spec = g.chooseStructuredAbility(w.a, w.ua, w.ub, w.st);
+  check('silenced unit cannot choose structured ability', spec === null);
+}
+
+{ // Untargetable unit takes 0 damage from DoT
+  const w = world();
+  w.ua.status.push('untargetable');
+  w.ua.status.push('burn');
+  w.ua.status.push('poison');
+  w.ua.statusMeta = { burn: { duration: 1 }, poison: { duration: 1 } };
+  const beforeHp = w.ua.hp;
+  g.processStatuses(w.ua, () => {});
+  check('untargetable unit takes no damage from DoT (burn/poison)', w.ua.hp === beforeHp);
+}
+
+{ // Untargetable unit resolves incoming damage as negated
+  const w = world();
+  w.ub.status.push('untargetable');
+  const res = g.resolveIncoming(w.ua, w.ub, 500, w.st, [], R5);
+  check('untargetable unit negates incoming damage', res.negated === true && res.hpLoss === 0);
+}
+
+{ // Strip buffs removes shield/barriers
+  const w = world();
+  w.ub.shield = 500;
+  w.ub.status.push('guarded');
+  const spec = { text: 'Test Strip', cooldown: 0, effects: [{ type: 'strip_buffs' }] };
+  g.applyStructuredAbility(w.a, w.ua, w.ub, w.st, [], R5, spec);
+  check('strip_buffs removes shield barrier', w.ub.shield === 0 && !w.ub.status.includes('guarded'));
+}
+
+{ // Execute instant kill below threshold
+  const w = world();
+  w.ub.maxHp = 1000;
+  w.ub.hp = 140; // 14% (<15%)
+  const spec = { text: 'Test Execute', cooldown: 0, damage: { multiplier: 1, type: 'physical' }, effects: [{ type: 'execute', threshold: 0.15 }] };
+  g.applyStructuredAbility(w.a, w.ua, w.ub, w.st, [], R5, spec);
+  check('execute instantly kills target below threshold', w.ub.hp === 0 && w.ub.alive === false);
+}
+
+{ // Sleep wakes when struck by an ability
+  const w = world();
+  w.ub.status.push('sleep');
+  const lines = [];
+  const spec = { text: 'Test Strike', cooldown: 0, damage: { multiplier: 1.5, type: 'physical' }, effects: [] };
+  g.applyStructuredAbility(w.a, w.ua, w.ub, w.st, lines, R5, spec);
+  check('sleep wakes when struck by an ability', !w.ub.status.includes('sleep') && lines.some(l => l.text.includes('wakes from Sleep')));
+}
+
+
 console.log(`\neffects-behavior: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
