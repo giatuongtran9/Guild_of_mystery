@@ -45,6 +45,11 @@
           {
             "type": "crit",
             "amount": 0.12
+          },
+          {
+            "type": "resistance",
+            "element": "poison",
+            "amount": 25
           }
         ]
       }
@@ -64,7 +69,15 @@
         "scale": 1.2,
         "damageType": "psychic",
         "formula": "pure_caster_ability",
-        "tag": null
+        "tag": null,
+        "effects": [
+          {
+            "type": "status_chance",
+            "status": "confused",
+            "chance": 0.35,
+            "duration": 1
+          }
+        ]
       }
     },
     {
@@ -82,7 +95,14 @@
         "scale": 1.3,
         "damageType": "poison",
         "formula": "pure_caster_ability",
-        "tag": null
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "curse",
+            "duration": 2
+          }
+        ]
       }
     },
     {
@@ -169,7 +189,7 @@
         "effects": [
           {
             "type": "status",
-            "status": "stunned",
+            "status": "frozen",
             "duration": 1
           }
         ]
@@ -262,7 +282,7 @@
         "cooldown": 5,
         "description": "Abyss of Despair — Unleashes primordial despair dealing 400% INT True DMG.",
         "stat": "INT",
-        "scale": 4.0,
+        "scale": 4,
         "damageType": "true",
         "formula": "pure_caster_ability",
         "tag": null,
