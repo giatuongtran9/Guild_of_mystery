@@ -73,7 +73,7 @@
         "effects": [
           {
             "type": "next_crit_fail",
-            "chance": 1.0
+            "chance": 1
           }
         ]
       }
@@ -97,7 +97,7 @@
         "effects": [
           {
             "type": "next_attack_miss",
-            "chance": 1.0
+            "chance": 1
           }
         ]
       }
@@ -198,7 +198,7 @@
         "label": "Active",
         "spCost": 70,
         "cooldown": 4,
-        "description": "Chaos Probability — Scrambles enemy skill success rates, causing 40% skill misfire chance.",
+        "description": "Chaos Probability — Scrambles enemy skill success rates, causing 40% skill misfire chance for all enemies.",
         "stat": "INT",
         "scale": 0,
         "damageType": "physical",
@@ -207,7 +207,8 @@
         "effects": [
           {
             "type": "skill_misfire",
-            "chance": 0.4
+            "chance": 0.4,
+            "duration": 2
           }
         ]
       }
@@ -248,7 +249,7 @@
         "cooldown": 4,
         "description": "Snake of Mercury — Sheds fate skin to negate fatal blow and deal 300% INT Fate DMG.",
         "stat": "INT",
-        "scale": 3.0,
+        "scale": 3,
         "damageType": "fate",
         "formula": "pure_caster_ability",
         "tag": null,
