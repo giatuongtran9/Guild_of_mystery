@@ -98,7 +98,14 @@
         "scale": 0,
         "damageType": "physical",
         "formula": "pure_caster_ability",
-        "tag": null
+        "tag": null,
+        "effects": [
+          {
+            "type": "status",
+            "status": "possession_phase",
+            "duration": 1
+          }
+        ]
       }
     },
     {
