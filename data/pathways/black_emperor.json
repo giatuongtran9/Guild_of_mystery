@@ -199,6 +199,10 @@
         "tag": null,
         "effects": [
           {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
+          {
             "type": "skill_misfire",
             "chance": 0.3,
             "duration": 2
@@ -264,6 +268,10 @@
         "formula": "empowered_hybrid_agility",
         "tag": null,
         "effects": [
+          {
+            "type": "targeting",
+            "mode": "all_enemies"
+          },
           {
             "type": "damage_rule",
             "rule": "true"
