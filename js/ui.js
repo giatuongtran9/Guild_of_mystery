@@ -133,7 +133,7 @@ function renderTurnRowHtml(row, showDetails) {
 
   if (row.type === 'death') {
     return `<div class="b-row death-row">
-      <span>💀 <b>${esc(row.targetName || 'Unit')}</b> falls.</span>
+      <span>${row.converted?'🧵':'💀'} <b>${esc(row.targetName || 'Unit')}</b> ${row.converted?'is converted into a Marionette.':'falls.'}</span>
     </div>`;
   }
 
@@ -194,7 +194,7 @@ function renderTurnRowHtml(row, showDetails) {
     : '';
 
   const deathsHtml = (row.deaths && row.deaths.length)
-    ? row.deaths.map(d => `<div class="b-sublines"><span class="b-subline" style="color:#ff8b8b;font-weight:600">💀 ${esc(d.targetName)} falls.</span></div>`).join('')
+    ? row.deaths.map(d => `<div class="b-sublines"><span class="b-subline" style="color:#ff8b8b;font-weight:600">${d.converted?'🧵':'💀'} ${esc(d.targetName)} ${d.converted?'is converted into a Marionette.':'falls.'}</span></div>`).join('')
     : '';
 
   const hasOutcomes = !!(damagesHtml || healsHtml || shieldsHtml);
