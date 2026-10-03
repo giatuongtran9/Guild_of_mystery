@@ -1,4 +1,3 @@
-
 // Structured combat event emission helpers
 function teamOf(u, state) {
   if (!state) return 'ally';
@@ -437,7 +436,10 @@ function hasThreadCC(agentUnit) {
   return ["stunned", "silenced", "frozen", "polymorphed", "bound", "unconscious"].some((x) => statuses.includes(x));
 }
 
+function threadUsage(state,agent){return (agent.threadTargets||[]).length+((state&&state.battleMarionettes)||[]).filter(m=>m.ownerId===agent.id&&m.unit.alive).length;}
+function threadCooldownFor(agent){const sp=unlockedAbilities(agent).find(x=>x.effectId==='thread_binding'||x.id==='thread_binding');const cd=Number(sp?.cooldown??5);return cd>0?cd+1:0;}
 function releaseThread(agent,enemy){
+  agent.cooldowns=agent.cooldowns||{};agent.cooldowns.thread_binding=threadCooldownFor(agent); // CD counts from the moment the thread resolves
   agent.threadTargets=(agent.threadTargets||[]).filter(id=>id!==enemy.id);
   agent.activeThreads=agent.threadTargets.length;
   enemy.thread=null;
@@ -451,7 +453,7 @@ function releaseThread(agent,enemy){
 function applySpiritThread(agent,enemy,actor,state,lines,r){
  if(!isThreadBeyonder(agent))return false;
  const slots=threadSlots(agent.sequence);
- if((agent.threadTargets||[]).length>=slots){lines.push({text:`${actor.name} has reached their personal thread limit (${slots}).`,kind:'system'});return false;}
+ if(threadUsage(state,agent)>=slots){lines.push({text:`${actor.name} has reached their personal thread limit (${slots}).`,kind:'system'});return false;}
 
  if(enemy.thread)return false;
  // Attempt budget per fight: keeps thread-kills a meaningful gamble now that fights last several rounds.
@@ -465,6 +467,28 @@ function applySpiritThread(agent,enemy,actor,state,lines,r){
  agent.threadTargets=[...(agent.threadTargets||[]),enemy.id];agent.activeThreads=agent.threadTargets.length;changeMeter(agent,'fool',-12);
  addStatus(enemy,'threaded',enemy.thread.required,'Spirit Body Thread');
  lines.push({text:`${actor.name} grasps the invisible Spirit Body Thread attached to ${enemy.name}.`,kind:'quirk'});return true;
+}
+function joinMarionette(state,owner,target,lines){
+  // Battle-only Marionette: 55% of the dead unit's stats, fights for the thread owner's side, never saved to the roster.
+  const pct=.55,ownerAllied=state.allies.some(x=>x.id===owner.id),rng=state.rng||Math.random;
+  const src=target.agent?{hp:target.maxHp,atk:target.agent.stats.atk,def:target.agent.stats.def,int:target.agent.stats.int}:{hp:target.maxHp,atk:target.atk,def:target.def,int:target.int};
+  const st={hp:Math.max(1,Math.round(src.hp*pct)),atk:Math.max(1,Math.round(src.atk*pct)),def:Math.max(1,Math.round(src.def*pct)),int:Math.max(1,Math.round(src.int*pct))};
+  const seq=target.agent?target.agent.sequence:target.sequence,path=target.agent?target.agent.path:target.path;
+  const name=`${target.name} — Marionette`,id=`mar_${target.id}`;let unit;
+  if(ownerAllied){
+    const ag=makeAgent(rng,{sequence:seq,path,trait:target.trait||'Stout Vitality'});
+    Object.assign(ag,{id,name,awakened:true,unitType:'marionette',ownerId:owner.id,stats:{...st},baseStats:{...st},injuries:0,madness:0,weaponId:'none',weaponMastery:{},cooldowns:{},threadTargets:[],activeThreads:0});
+    ag.sp=maxSPFor(ag);ag.maxSP=ag.sp;
+    unit={id,name,agent:ag,hp:st.hp,maxHp:st.hp,alive:true,inCombat:true,summoned:true,status:[],statusMeta:{},resistances:ag.resistances||{}};
+    state.allies.push(unit);
+  }else{
+    unit=makeEnemy(seq,rng,state.enemies.length,path);
+    Object.assign(unit,{id,name,unitType:'marionette',ownerId:owner.id,summoned:true,hp:st.hp,maxHp:st.hp,atk:st.atk,def:st.def,int:st.int,resistanceInt:st.int,stats:{...st},status:[],statusMeta:{},alive:true,thread:null,cooldowns:{},weaponId:'none'});
+    state.enemies.push(unit);
+  }
+  state.battleMarionettes=state.battleMarionettes||[];state.battleMarionettes.push({ownerId:owner.id,unit,side:ownerAllied?'ally':'enemy'});
+  lines.push({text:`${name} rises under ${owner.name||'its owner'}'s control (55% stats) and joins the fight.`,kind:'quirk'});
+  emitCombatEvent(state,{round:state?.currentRound||1,type:'system',text:`${name} joins ${owner.name||'the owner'}'s side as a Marionette.`});
 }
 function processSpiritThreads(state,lines){const allUnits=[...state.allies,...state.enemies];for(const ally of allUnits.filter(x=>x.alive&&isThreadBeyonder(x.agent||x))){const agent=ally.agent||ally;const targets=state.allies.includes(ally)?state.enemies:state.allies;for(const enemy of targets.filter(x=>x.thread?.ownerId===agent.id)){const t=enemy.thread;if(!enemy.alive){releaseThread(agent,enemy);lines.push({text:`The thread ends because ${enemy.name} is dead; the slot is freed.`,kind:"system"});continue;}if(!ally.alive||hasThreadCC(ally)){releaseThread(agent,enemy);lines.push({text:`The thread on ${enemy.name} is interrupted and its progress resets.`,kind:"status"});if(agent._threadAttempts>0)agent._threadAttempts--;continue;}t.progress++;
       if(t.progress===1){
@@ -480,8 +504,8 @@ function processSpiritThreads(state,lines){const allUnits=[...state.allies,...st
       }
       if(t.progress>=t.required){
         enemy.hp=0;enemy.alive=false;releaseThread(agent,enemy);changeMeter(agent,"fool",18);
-        lines.push({text:`${agent.name} completes the Spirit Body Thread. ${enemy.name} dies and becomes a permanent Marionette.`,kind:"victory"});emitCombatEvent(state,{round:state?.currentRound||1,type:'death',actorId:agent.id,actorName:agent.name,actorTeam:teamOf(agent,state),targetId:enemy.id,targetName:enemy.name,targetTeam:teamOf(enemy,state),text:`${enemy.name} dies and becomes a permanent Marionette.`});
-        if(state.allies.some(x=>x.id===agent.id))state.createdMarionettes.push({ownerId:agent.id,source:cloneE(enemy)});
+        lines.push({text:`${agent.name} completes the Spirit Body Thread. ${enemy.name} dies and becomes a Marionette for the rest of this battle.`,kind:"victory"});emitCombatEvent(state,{round:state?.currentRound||1,type:'death',actorId:agent.id,actorName:agent.name,actorTeam:teamOf(agent,state),targetId:enemy.id,targetName:enemy.name,targetTeam:teamOf(enemy,state),text:`${enemy.name} dies and becomes a Marionette (this battle only).`,converted:true});
+        joinMarionette(state,agent,enemy,lines);
       }else{
         lines.push({text:`${enemy.name}'s thread holds. ${t.required-t.progress} round(s) remain.`,kind:"status"});emitCombatEvent(state,{round:state?.currentRound||1,type:'thread',actorId:agent.id,actorName:agent.name,actorTeam:teamOf(agent,state),targetId:enemy.id,targetName:enemy.name,targetTeam:teamOf(enemy,state),text:`${enemy.name}'s thread holds. ${t.required-t.progress} round(s) remain.`});
       }}}}
@@ -710,7 +734,7 @@ function chooseStructuredAbility(agent,actor,enemy,state){
  const hpRatio=actor.hp/Math.max(1,actor.maxHp); let specs=activeSpecs(agent).filter(x=>x.effectId!=='thread_binding'&&abilityReady(agent,x));  // Thread Binding is resolved in powerEffect via applySpiritThread
  if(!specs.length)return null;
  // Fool: bank SP for Thread Binding (45 SP) instead of spending it on cheap casts every round.
- if(agent.path==='fool'&&agent.sequence<=5&&abilityAvailable(agent,'thread_binding')&&!(agent.cooldowns?.thread_binding>0)&&(agent.sp||0)<45)return null;
+ if(agent.path==='fool'&&agent.sequence<=5&&abilityAvailable(agent,'thread_binding')&&!(agent.cooldowns?.thread_binding>0)&&threadUsage(state,agent)<threadSlots(agent.sequence)&&(agent.sp||0)<45)return null;
  if(agent.path==='error' && agent.sequence===9){const x=specs.find(s=>s.id==='combat_theft'||s.effectId==='combat_theft');if(x)return x;}
 
  // Time Theft: if all enemies have already moved this round, skip Time Theft and pick another skill
@@ -989,8 +1013,8 @@ function powerEffect(a,actor,enemy,state,lines,r){
     const threadCost = Number(threadSpec?.costSP ?? 45);
     const threadCd = Number(threadSpec?.cooldown ?? 5);
     const budget=({5:1,4:2,3:2,2:3,1:3,0:4})[a.sequence]||1;
-    if(!enemy.thread && (a.sp||0)>=threadCost && !(a.cooldowns?.thread_binding>0) && (a._threadAttempts||0)<budget){
-      a.sp-=threadCost; a.cooldowns.thread_binding=threadCd > 0 ? threadCd + 1 : 0;
+    if(!enemy.thread && (a.sp||0)>=threadCost && !(a.cooldowns?.thread_binding>0) && (a._threadAttempts||0)<budget && threadUsage(state,a)<threadSlots(a.sequence)){
+      a.sp-=threadCost; a.cooldowns.thread_binding=999; // locked until the thread resolves (releaseThread sets the real CD)
       lines.push({text:`ACTION: ${actor.name} casts [Thread Binding] (Cost: ${threadCost} SP | ${threadCd}-Turn CD).`,kind:'action'});
     emitCombatEvent(state, {
       round: state?.currentRound || 1,
@@ -1002,7 +1026,7 @@ function powerEffect(a,actor,enemy,state,lines,r){
       costSP: threadCost,
       cooldown: threadCd
     });
-      applySpiritThread(a,enemy,actor,state,lines,r);
+      if(!applySpiritThread(a,enemy,actor,state,lines,r))a.cooldowns.thread_binding=threadCd > 0 ? threadCd + 1 : 0;
       return true;
     }
   }
@@ -1033,7 +1057,7 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
  const r=rand(seed),lines=[],consequences=[],allies=members.map(a=>{const es=effectiveStats(a);const ag=cloneE(a); const pm=passiveCombatModifier(ag); ag.resistances={...(G9D.balance.element_resistance_rules?.path_resistances?.[ag.path]||{}),...(pm.resistances||{}),...(ag.resistances||{})}; return {id:a.id,name:a.name,agent:ag,hp:Math.round(es.hp*(pm.hp||1)),maxHp:Math.round(es.hp*(pm.hp||1)),alive:true,inCombat:true,status:[],statusMeta:{},resistances:ag.resistances};});
  const simulationOpponents=Array.isArray(decisions.simulationOpponents)?decisions.simulationOpponents:null; const enemyCount=simulationOpponents?.length || quest.enemyCount|| (allies.length===1?1:(allies.length>=3 && quest.difficultySequence>=7?2:(quest.difficultySequence>=5?2:3))); const enemies=quest.encounter?(simulationOpponents?simulationOpponents.map((spec,i)=>makeEnemy(spec.sequence,r,i,spec.path)):Array.from({length:enemyCount},(_,i)=>makeEnemy(quest.difficultySequence,r,i,quest.requiredPath))):[];
  for(const e of enemies){try{const epm=passiveCombatModifier(e);if(epm.hp&&epm.hp!==1){e.maxHp=Math.round(e.maxHp*epm.hp);e.hp=e.maxHp;}}catch(err){}}
- const individual=!!decisions.individual; const state={allies,enemies,individual,createdMarionettes:[],weaponUsage:{},combatStatsShown:false,balanceTrace:[],events:[]};
+ const individual=!!decisions.individual; const state={allies,enemies,individual,createdMarionettes:[],battleMarionettes:[],rng:r,weaponUsage:{},combatStatsShown:false,balanceTrace:[],events:[]};
  lines.push({text:`Contract: ${quest.name}`,kind:'system'},{text:quest.story||quest.brief,kind:'story'});
  if(!quest.encounter){
    if(quest.objective==='rescue'){lines.push({text:'The guild searches the neighborhood rather than hunting for a fight. Clues lead through an alley, beneath a bakery awning, and into a coal shed.',kind:'system'},{text:'The missing cat is found frightened but unharmed and returned to its owner.',kind:'victory'});}
@@ -1060,7 +1084,7 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
    tickCombatEffectDurations([...allies,...enemies]);applyPassiveAuras([...allies,...enemies],state);
    const order=[...allies.filter(x=>x.alive),...enemies.filter(x=>x.alive)].sort((a,b)=>unitInitiative(b)-unitInitiative(a));
    const actors=order;
-   for(const c of actors){if(!c.alive||c.inCombat===false)continue;beginTurn(c);c._actedThisRound = true;
+   for(const c of actors){try{if(!c.alive||c.inCombat===false)continue;beginTurn(c);c._actedThisRound = true;
        if(c._skipTurns>0||hasStatus(c,'banished')){if(c._skipTurns>0)c._skipTurns--;lines.push({text:`${c.name} is banished in a spatial fold and cannot act.`,kind:'status'});if(!c._skipTurns||c._skipTurns<=0){removeStatus(c,'banished');removeStatus(c,'untargetable');}continue;}
        if(c.agent){const pressure=0;
        if((c.agent.madness||0)>=50&&r()<.18){lines.push({text:`${c.name} loses the action to mounting Madness.`,kind:'status'});continue;}if(actionDisabled(c)){
@@ -1093,19 +1117,20 @@ function resolveQuest(members,quest,seed=Date.now(),decisions={}){
        if(c.thread&&c.thread.progress>=4&&r()<0.30){addStatus(c,'bound',1,'Spirit Body Thread');}
        const safer=targets.filter(x=>x.hp/x.maxHp>.25);const pool=(safer.length?safer:targets);const okp=pool.filter(x=>!hasStatus(x,'untargetable'));const t=pickR(r,tauntFilter(c,okp.length?okp:pool));
        const enemyAgent={...c,stats:{hp:c.maxHp,atk:c.atk,def:c.def,int:c.int},baseStats:{hp:c.maxHp,atk:c.atk,def:c.def,int:c.int},abilities:c.abilities||[],abilityHistory:c.abilityHistory||[],weaponId:c.weaponId||'none',weaponMastery:c.weaponMastery||{},cooldowns:c.cooldowns||{},resistances:{...(c.resistances||{}),...(passiveCombatModifier(c).resistances||{})},_outgoingMultiplier:(state.individual?COMBAT_BALANCE.enemyDamageIndividual:COMBAT_BALANCE.enemyDamageParty)};
-       if(!state.combatStatsShown)state.combatStatsShown={};if(!state.combatStatsShown[c.id]){lines.push({text:`Combat begins: ${c.name} · HP ${c.maxHp} · ATK ${c.atk} · DEF ${c.def} · INT ${c.int} · Speed ${speedFor(c).toFixed(1)} · AV ${actionValueFor(c).toFixed(1)}.`,kind:'system'});state.combatStatsShown[c.id]=true;}const before=t.hp; powerEffect(enemyAgent,c,t,state,lines,r); if(c._extraTurns>0&&c.alive){c._extraTurns--;powerEffect(enemyAgent,c,t,state,lines,r);} c.atk=enemyAgent.stats.atk; c.def=enemyAgent.stats.def; c.int=enemyAgent.stats.int; c.cooldowns=enemyAgent.cooldowns||{}; c.resistances=enemyAgent.resistances||{};
+       if(!state.combatStatsShown)state.combatStatsShown={};if(!state.combatStatsShown[c.id]){lines.push({text:`Combat begins: ${c.name} · HP ${c.maxHp} · ATK ${c.atk} · DEF ${c.def} · INT ${c.int} · Speed ${speedFor(c).toFixed(1)} · AV ${actionValueFor(c).toFixed(1)}.`,kind:'system'});state.combatStatsShown[c.id]=true;}const before=t.hp; powerEffect(enemyAgent,c,t,state,lines,r); if(c._extraTurns>0&&c.alive){c._extraTurns--;powerEffect(enemyAgent,c,t,state,lines,r);} c.atk=enemyAgent.stats.atk; c.def=enemyAgent.stats.def; c.int=enemyAgent.stats.int; c.cooldowns=enemyAgent.cooldowns||{}; c.resistances=enemyAgent.resistances||{}; if(isThreadBeyonder(enemyAgent)){c.threadTargets=enemyAgent.threadTargets||[];c.activeThreads=c.threadTargets.length;c._threadAttempts=enemyAgent._threadAttempts||0;c.sp=enemyAgent.sp;c.maxSP=enemyAgent.maxSP;}
        if(t.hp>0&&t.hp<before){}
 
    }
+   }finally{tickUnitStatuses(c);}
    }
  }
  const success=allies.some(x=>x.alive&&x.inCombat)&&!enemies.some(x=>x.alive); if(success)lines.push({text:'The hostile force is defeated and the guild completes the contract.',kind:'victory'});else lines.push({text:'The guild is defeated in the encounter.',kind:'failure'});
- for(const u of allies){const a=u.agent;const gain=digestGain(quest,individual,a);if(success){
+ for(const u of allies.filter(x=>!x.summoned)){const a=u.agent;const gain=digestGain(quest,individual,a);if(success){
   a.digest=Math.min(100,(a.digest||0)+gain);
   const equipped=weaponFor(a), masteryAmount=G9D.system.weapon_mastery.per_completed_contract||2;
   gainWeaponMastery(a,equipped.kind,masteryAmount);
 }
 a.injuries=Math.min(100,(a.injuries||0)+(u.alive?Math.max(0,Math.round((u.maxHp-u.hp)/u.maxHp*25)):30));a.madness=Math.max(0,Math.min(100,(a.madness||0)+(success?-3:12)));changeMeter(a,a.path,success?12:6);if(!u.alive){consequences.push({type:'death',agentId:a.id,text:`${a.name} dies during the contract and is removed from the roster.`});}else{consequences.push({type:'syncAgent',agentId:a.id,agent:a,text:success?`${a.name} returns with new experience and ${gain}% digestion.`:`${a.name} returns shaken from the failed contract.`});}if(a.madness>=100)consequences.push({type:'corruptedDeath',agentId:a.id,text:`${a.name} reaches 100 Madness and becomes a corrupted monster.`});}
  const rewards=cloneE(quest.rewards);if(!success){rewards.funds=Math.round(rewards.funds*.35);rewards.reputation=0;}
- return {lines,events:state.events||[],success,consequences,marionettes:state.createdMarionettes,weaponUsage:state.weaponUsage,rewards,dayCost:1,battleSnapshot:{allies:allies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),enemies:enemies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),balanceTrace:state.balanceTrace,events:state.events||[]}};
+ return {lines,events:state.events||[],success,consequences,marionettes:[],marionettesCreated:(state.battleMarionettes||[]).filter(m=>m.side==='ally').length,enemyMarionettesCreated:(state.battleMarionettes||[]).filter(m=>m.side==='enemy').length,weaponUsage:state.weaponUsage,rewards,dayCost:1,battleSnapshot:{allies:allies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),enemies:enemies.map(x=>({name:x.name,alive:x.alive,hp:x.hp,maxHp:x.maxHp})),balanceTrace:state.balanceTrace,events:state.events||[]}};
 }
