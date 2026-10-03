@@ -84,6 +84,7 @@ T.next_attack_miss = () => {
 };
 T.next_crit_fail = () => { const r = cast([{ type: 'next_crit_fail', chance: 1 }]); return !!r.ub._nextCritFail; };
 T.copy_ability = () => { const r = cast([{ type: 'copy_ability' }]); return true; };
+T.sp_siphon = () => { const r = cast([{ type: 'sp_siphon', amount: 15 }]); return true; };
 T.extra_turn = () => cast([{ type: 'extra_turn', amount: 1 }]).ua._extraTurns > 0;
 T.reset_state = () => { const r = cast([{ type: 'reset_state', amount: 1 }], ({ a }) => { a.cooldowns = { x: 5 }; }); return !r.a.cooldowns?.x; };
 T.knockback = () => cast([{ type: 'knockback', amount: 2 }]).ub.distance > 5;
@@ -360,6 +361,25 @@ for (const [t, fn] of Object.entries(T)) { let ok = false, d; try { ok = !!fn();
   const chosenLow = g.chooseStructuredAbility(w.a, w.ua, w.ub, w.st);
   const chosenAtLow = chosenLow && (chosenLow.id === 'undying_rebirth_aura' || chosenLow.effectId === 'undying_rebirth_aura');
   check('undying rebirth aura only usable below 30% HP', notChosenAtFull && chosenAtLow);
+}
+
+
+// --- Polymorphed skips action like stun
+{
+  const w = world();
+  g.addStatus(w.ua, 'polymorphed', 1);
+  check('polymorphed disables action', g.actionDisabled(w.ua) === true);
+}
+
+// --- SP Siphon siphons SP from enemy to caster
+{
+  const w = world();
+  w.a.sp = 10;
+  w.ub.agent.sp = 50;
+  w.ub.sp = 50;
+  const spec = { id: 'test_siphon', text: 'Test Siphon', cooldown: 1, costSP: 0, effects: [{ type: 'sp_siphon', amount: 15 }] };
+  g.applyStructuredAbility(w.a, w.ua, w.ub, w.st, [], () => 0.5, spec);
+  check('sp_siphon transfers SP correctly', w.a.sp === 25 && w.ub.sp === 35);
 }
 
 console.log(`\neffects-behavior: ${pass} passed, ${fail} failed`);
