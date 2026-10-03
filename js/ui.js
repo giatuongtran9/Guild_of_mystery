@@ -14,21 +14,35 @@ function flattenTurnRows(groupedRounds) {
 function calculateCurrentHp(initialAllies, initialEnemies, shownRows) {
   const hpMap = {};
   for (const a of (initialAllies || [])) {
-    const entry = { ...a, curHp: a.maxHp, maxHp: a.maxHp };
+    const entry = { ...a, curHp: a.maxHp, maxHp: a.maxHp, curShield: 0 };
     if (a.id) hpMap[a.id] = entry;
     if (a.name) hpMap[a.name] = entry;
   }
   for (const e of (initialEnemies || [])) {
-    const entry = { ...e, curHp: e.maxHp, maxHp: e.maxHp };
+    const entry = { ...e, curHp: e.maxHp, maxHp: e.maxHp, curShield: 0 };
     if (e.id) hpMap[e.id] = entry;
     if (e.name) hpMap[e.name] = entry;
   }
 
   for (const row of shownRows) {
+    if (row.shields) {
+      for (const s of row.shields) {
+        const target = hpMap[s.targetId] || hpMap[s.targetName];
+        if (target) {
+          target.curShield = (target.curShield || 0) + (s.amount || 0);
+        }
+      }
+    }
     if (row.damages) {
       for (const d of row.damages) {
         const target = hpMap[d.targetId] || hpMap[d.targetName];
         if (target) {
+          if (d.absorbed) {
+            target.curShield = Math.max(0, (target.curShield || 0) - (d.absorbed || 0));
+          }
+          if (d.shieldAfter !== undefined) {
+            target.curShield = d.shieldAfter;
+          }
           if (d.hpAfter !== undefined) target.curHp = d.hpAfter;
           else target.curHp = Math.max(0, target.curHp - (d.amount || 0));
         }
@@ -46,12 +60,12 @@ function calculateCurrentHp(initialAllies, initialEnemies, shownRows) {
     if (row.deaths) {
       for (const d of row.deaths) {
         const target = hpMap[d.targetId] || hpMap[d.targetName];
-        if (target) target.curHp = 0;
+        if (target) { target.curHp = 0; target.curShield = 0; }
       }
     }
     if (row.type === 'death' && (row.targetId || row.targetName)) {
       const target = hpMap[row.targetId] || hpMap[row.targetName];
-      if (target) target.curHp = 0;
+      if (target) { target.curHp = 0; target.curShield = 0; }
     }
   }
   return hpMap;
@@ -59,18 +73,22 @@ function calculateCurrentHp(initialAllies, initialEnemies, shownRows) {
 
 function renderHpStrip(hpMap, allies, enemies) {
   function card(u, team) {
-    const data = (u.id && hpMap[u.id]) || (u.name && hpMap[u.name]) || { curHp: u.hp || u.maxHp, maxHp: u.maxHp };
+    const data = (u.id && hpMap[u.id]) || (u.name && hpMap[u.name]) || { curHp: u.hp || u.maxHp, maxHp: u.maxHp, curShield: 0 };
     const cur = Math.max(0, data.curHp);
     const max = Math.max(1, data.maxHp);
+    const shield = Math.max(0, data.curShield || 0);
     const pct = Math.min(100, Math.round((cur / max) * 100));
+    const shieldPct = Math.min(100, Math.round((shield / max) * 100));
     const dead = cur <= 0;
-    return `<div class="hp-card ${team} ${dead ? 'dead' : ''}" title="${esc(u.name)}: ${cur.toLocaleString()} / ${max.toLocaleString()} HP">
+    const shieldLabel = shield > 0 ? ` (+${abbrNum(shield)})` : '';
+    return `<div class="hp-card ${team} ${dead ? 'dead' : ''}" title="${esc(u.name)}: ${cur.toLocaleString()}${shield > 0 ? ' (Shield: ' + shield.toLocaleString() + ')' : ''} / ${max.toLocaleString()} HP">
       <div class="hp-card-meta">
         <span class="name ${team}">${esc(u.name)}</span>
-        <span class="val">${abbrNum(cur)} / ${abbrNum(max)}</span>
+        <span class="val">${abbrNum(cur)}${shieldLabel} / ${abbrNum(max)}</span>
       </div>
       <div class="hp-bar-bg">
         <div class="hp-bar-fill ${team}" style="width: ${pct}%"></div>
+        ${shieldPct > 0 ? `<div class="hp-bar-shield" style="width: ${shieldPct}%"></div>` : ''}
       </div>
     </div>`;
   }
