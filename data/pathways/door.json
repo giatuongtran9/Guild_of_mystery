@@ -133,9 +133,7 @@
         "tag": null,
         "effects": [
           {
-            "type": "execute",
-            "threshold": 0.25,
-            "multiplier": 1.5
+            "type": "copy_ability"
           }
         ]
       }
